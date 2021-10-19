@@ -3,13 +3,11 @@
 </template>
 
 <script>
-
-import axios from 'axios';
-import { AUTH_LOGOUT } from './config/constant';
+import axios from "axios";
+import { AUTH_LOGOUT } from "./config/constant";
 export default {
-  name: 'App',
-  components: {
-  },
+  name: "App",
+  components: {},
   created: function() {
     axios.interceptors.response.use(undefined, function(err) {
       return new Promise((resolve, reject) => {
@@ -27,13 +25,12 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>
