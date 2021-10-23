@@ -15,7 +15,11 @@
                     <div class="main__create-acc-text">Create Account</div>
                     <div class="social-buttons">
                         <SocialLoginButton icon="fab fa-google" link="#" />
-                        <SocialLoginButton icon="fab fa-facebook-f" link="#" />
+                        <SocialLoginButton
+                            @click="signupWithFacebook"
+                            icon="fab fa-facebook-f"
+                            link="#"
+                        />
                         <SocialLoginButton icon="fab fa-linkedin-in" link="#" />
                     </div>
                     <p>or use your email for registration:</p>
@@ -58,7 +62,7 @@ import SocialLoginButton from "../../core/components/SocialLoginBtn";
 import InputField from "../../core/components/InputField";
 import LanguageSelector from "../../core/components/LanguageSelector.vue";
 import useVuelidate from "@vuelidate/core";
-
+import FBHelper from "../../helpers/FBHelper";
 import http from "../../core/http";
 import { required, email } from "@vuelidate/validators";
 export default {
@@ -72,7 +76,7 @@ export default {
     computed: {
         validation: function() {
             return {
-                validEmail: !this.v$.email.$touch || !this.v$.email.$error,
+                validEmail: !this.v$.email.$dirty || !this.v$.email.$error,
                 emailTouched: this.v$.email.$dirty,
             };
         },
@@ -120,6 +124,36 @@ export default {
                 .catch((err) => {
                     console.log(err);
                 });
+        },
+        signupWithFacebook: async function() {
+            try {
+                const { accessToken } = await FBHelper.login();
+                const response = await http.request({
+                    method: http.METHOD.POST,
+                    data: { facebookToken: accessToken },
+                    path: "sign-up/use-facebook",
+                });
+                console.log(response);
+            } catch (err) {
+                console.log(err);
+            }
+            // FBHelper.login().then(({ accessToken }) => {
+            //     console.log(accessToken);
+            //     http.request({
+            //         method: http.METHOD.POST,
+            //         data: { facebookToken: accessToken },
+            //         path: "sign-up/use-facebook",
+            //     })
+            //         .then((data) => {
+            //             console.log(data);
+            //         })
+            //         .catch((err) => {
+            //             console.log(err);
+            //         });
+            // });
+        },
+        logout: function() {
+            FBHelper.logout();
         },
     },
     validations: {
