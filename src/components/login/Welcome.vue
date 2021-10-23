@@ -35,7 +35,11 @@
                             icon="fab fa-facebook-f"
                             link="#"
                         />
-                        <SocialLoginButton icon="fab fa-linkedin-in" link="#" />
+                        <SocialLoginButton
+                            v-on:click="logout"
+                            icon="fab fa-linkedin-in"
+                            link="#"
+                        />
                     </div>
                     <p>or use your email for registration:</p>
                     <InputField
@@ -104,6 +108,9 @@ export default {
             FBHelper.login().then(({ accessToken }) => {
                 console.log(accessToken);
             });
+        },
+        logout: function() {
+            FBHelper.logout();
         },
     },
     validations: {

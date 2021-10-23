@@ -28,6 +28,7 @@ const FBHelper = {
                 function(response) {
                     if (response.authResponse) {
                         resolve(response.authResponse);
+                        console.log(response);
                     } else {
                         reject();
                     }
@@ -45,6 +46,11 @@ const FBHelper = {
                     reject();
                 }
             });
+        });
+    },
+    logout() {
+        window.FB.logout(function(response) {
+            console.log(response);
         });
     },
 };
