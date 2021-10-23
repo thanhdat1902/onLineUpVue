@@ -1,26 +1,26 @@
-import axios from 'axios';
-import SingletonPromise from '../utils/SingletonPromise';
+import axios from "axios";
+import SingletonPromise from "../utils/SingletonPromise";
 
 const DEFAULT_HEADERS = {
-  Accept: 'application/json',
-  'Content-Type': 'application/json',
+  Accept: "application/json",
+  "Content-Type": "application/json",
 };
 
 const METHOD = {
-  GET: 'get',
-  POST: 'post',
+  GET: "get",
+  POST: "post",
 };
 
 export default {
   METHOD,
   setAccessToken(token) {
-    localStorage.setItem('user-token', token); // store the token in localstorage
+    localStorage.setItem("user-token", token); // store the token in localstorage
   },
   removeAccessToken() {
-    localStorage.removeItem('user-token');
+    localStorage.removeItem("user-token");
   },
   getAccessToken() {
-    return localStorage.getItem('user-token');
+    return localStorage.getItem("user-token");
   },
 
   _getHeader() {
@@ -33,7 +33,7 @@ export default {
 
   request(props) {
     const {
-      path = '',
+      path = "",
       data = null,
       method = METHOD.GET,
       requestId = new Date().getTime() + path,

@@ -2,8 +2,9 @@ import store from "../store"; // your vuex store
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "../components/Home.vue";
 import Account from "../components/Account.vue";
-import Login from "../components/Login.vue";
+import Login from "../components/login/Login.vue";
 import Welcome from "../components/login/Welcome.vue";
+import Register from "../components/login/Register.vue";
 
 const ifNotAuthenticated = (to, from, next) => {
   if (!store.getters.isAuthenticated) {
@@ -35,10 +36,9 @@ export default new createRouter({
       component: Welcome,
     },
     {
-      path: "/account",
-      name: "Account",
-      component: Account,
-      beforeEnter: ifAuthenticated,
+      path: "/welcome",
+      name: "Welcome",
+      component: Welcome,
     },
     {
       path: "/login",
@@ -46,5 +46,22 @@ export default new createRouter({
       component: Login,
       beforeEnter: ifNotAuthenticated,
     },
+    {
+      path: "/register",
+      name: "Register",
+      component: Register,
+    },
+    {
+      path: "/account",
+      name: "Account",
+      component: Account,
+      beforeEnter: ifAuthenticated,
+    },
+    // {
+    //   path: "/login",
+    //   name: "Login",
+    //   component: Login,
+    //   beforeEnter: ifNotAuthenticated,
+    // },
   ],
 });

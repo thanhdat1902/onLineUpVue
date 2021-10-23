@@ -22,19 +22,16 @@
             @focus="handldeFocusInput"
             v-model="email"
             class="main__create-acc-input"
-            :class="{ 'input--error': !validation.validEmail }"
+            :class="{ 'input--error': invalidEmail }"
             placeholder="Email"
           />
           <p
-            v-if="v$.email.required.$invalid && v$.email.$dirty"
+            v-if="v$.email.required.$invalid && invalidEmail"
             class="error-msg"
           >
             The email is required
           </p>
-          <p
-            v-if="v$.email.email.$invalid && v$.email.$dirty"
-            class="error-msg"
-          >
+          <p v-if="v$.email.email.$invalid && invalidEmail" class="error-msg">
             Invalid form of email
           </p>
           <Button @btnClicked="handleSignUpButton" text="SIGN UP" link="#" />
@@ -51,21 +48,22 @@ import SocialLoginButton from "../../core/components/SocialLoginBtn";
 import InputField from "../../core/components/InputField";
 import LanguageSelector from "../../core/components/LanguageSelector.vue";
 import useVuelidate from "@vuelidate/core";
-
-import http from "../../core/http";
 import { required, email } from "@vuelidate/validators";
 export default {
-  name: "Welcome",
+  name: "Login",
   setup: () => ({ v$: useVuelidate() }),
   data: function() {
     return {
+      invalidEmail: false,
       email: "",
     };
   },
   computed: {
     validation: function() {
       return {
-        validEmail: !this.v$.email.$touch || !this.v$.email.$error,
+        validEmail:
+          !this.v$.email.$touch ||
+          (!this.v$.email.email.$invalid && !this.v$.email.required.$invalid),
         emailTouched: this.v$.email.$dirty,
       };
     },
@@ -89,31 +87,22 @@ export default {
 
     handleValidEmail: function() {
       this.v$.email.$touch();
+      if (this.validation.validEmail) {
+        return;
+      }
+      this.invalidEmail = true;
     },
     handleInput: function(value) {
       this.email = value;
     },
     handldeFocusInput: function() {
       this.invalidEmail = false;
-      console.log(this.invalidEmail);
     },
     handleSignUpButton: function() {
-      // console.log(this.validation.emailTouched);
-      // if (!this.validation.emailTouched) {
-      //   this.invalidEmail = true;
-      // }
-      http
-        .request({
-          method: http.METHOD.POST,
-          data: { email: this.email },
-          path: "sign-up/post-email",
-        })
-        .then((data) => {
-          console.log(data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      console.log(this.validation.emailTouched);
+      if (!this.validation.emailTouched) {
+        this.invalidEmail = true;
+      }
     },
   },
   validations: {

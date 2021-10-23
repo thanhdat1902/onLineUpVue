@@ -1,5 +1,5 @@
 <template>
-  <a v-bind:href="link" id="button">{{ text }} </a>
+  <a @click="handleClicked" v-bind:href="link" id="button">{{ text }} </a>
 </template>
 
 <script>
@@ -8,6 +8,11 @@ export default {
   props: {
     text: String,
     link: String,
+  },
+  methods: {
+    handleClicked: function() {
+      this.$emit("btnClicked", event.target.value);
+    },
   },
 };
 </script>
