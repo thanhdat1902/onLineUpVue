@@ -8,7 +8,7 @@
                 <div class="main__check-otp-area">
                     <div class="main__check-otp-text">OTP</div>
                     <p>The OTP is valid for 30s</p>
-                    <p id="main__check-otp-timer">{{ timerCount }}</p>
+                    <!-- <p id="main__check-otp-timer">{{ timerCount }}</p> -->
                     <OTPInput @submitOTP="handleOnComplete" ref="resendOtp" />
                     <a
                         @click="handleResendValidation"
@@ -29,23 +29,23 @@ export default {
     components: {
         OTPInput,
     },
-    data: function() {
-        return {
-            timerCount: 30,
-        };
-    },
-    watch: {
-        timerCount: {
-            handler(value) {
-                if (value > 0) {
-                    setTimeout(() => {
-                        this.timerCount--;
-                    }, 1000);
-                }
-            },
-            immediate: true, // This ensures the watcher is triggered upon creation
-        },
-    },
+    // data: function() {
+    //     return {
+    //         timerCount: 30,
+    //     };
+    // },
+    // watch: {
+    //     timerCount: {
+    //         handler(value) {
+    //             if (value > 0) {
+    //                 setTimeout(() => {
+    //                     this.timerCount--;
+    //                 }, 1000);
+    //             }
+    //         },
+    //         immediate: true, // This ensures the watcher is triggered upon creation
+    //     },
+    // },
     methods: {
         handleOnComplete(value) {
             console.log("OTP completed: ", value);
