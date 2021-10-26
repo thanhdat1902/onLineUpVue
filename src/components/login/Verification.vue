@@ -6,9 +6,20 @@
                     ><i class="fas fa-long-arrow-alt-left"> </i
                 ></router-link>
                 <div class="main__check-otp-area">
-                    <div class="main__check-otp-text">OTP</div>
+                    <div class="main__check-otp-text">
+                        OTP
+                    </div>
                     <p>The OTP is valid for 30s</p>
-                    <!-- <p id="main__check-otp-timer">{{ timerCount }}</p> -->
+                    <p
+                        id="main__check-otp-timer"
+                        :style="[
+                            this.timer > 10
+                                ? { color: 'black' }
+                                : { color: 'red' },
+                        ]"
+                    >
+                        {{ timerCountdown }}
+                    </p>
                     <OTPInput @submitOTP="handleOnComplete" ref="resendOtp" />
                     <a
                         @click="handleResendValidation"
@@ -29,23 +40,30 @@ export default {
     components: {
         OTPInput,
     },
-    // data: function() {
-    //     return {
-    //         timerCount: 30,
-    //     };
-    // },
-    // watch: {
-    //     timerCount: {
-    //         handler(value) {
-    //             if (value > 0) {
-    //                 setTimeout(() => {
-    //                     this.timerCount--;
-    //                 }, 1000);
-    //             }
-    //         },
-    //         immediate: true, // This ensures the watcher is triggered upon creation
-    //     },
-    // },
+    data() {
+        return {
+            timer: 30,
+        };
+    },
+    computed: {
+        timerCountdown() {
+            var minutes = Math.floor(parseInt(this.timer, 10) / 60);
+            var seconds = parseInt(this.timer, 10) - minutes * 60;
+            minutes = ("0" + minutes).slice(-2);
+            seconds = ("0" + seconds).slice(-2);
+            return `${minutes}:${seconds}`;
+        },
+    },
+    mounted() {
+        setInterval(() => {
+            if (this.timer > 0) this.timer -= 1;
+        }, 1000);
+    },
+    watch: {
+        timer(val) {
+            if (val === 0) console.log(val); //disable OTP
+        },
+    },
     methods: {
         handleOnComplete(value) {
             console.log("OTP completed: ", value);
@@ -57,7 +75,7 @@ export default {
             //resend Otp
             //reset OTPInput
             this.$refs.resendOtp.resetOtp();
-            this.timerCount = 30;
+            this.timer = 30;
         },
     },
 };
