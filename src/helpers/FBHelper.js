@@ -19,8 +19,6 @@ const FBHelper = {
             });
         };
         this.loadFacebookSDKScript(document, "script", "facebook-jssdk");
-
-        // load facebook sdk script
     },
     login() {
         return new Promise((resolve, reject) => {
@@ -35,6 +33,33 @@ const FBHelper = {
                 },
                 { scope: "public_profile,email" }
             );
+        });
+    },
+    getToken() {
+        return new Promise((resolve, reject) => {
+            window.FB.getLoginStatus(function(response) {
+                if (response.status === "connected" && response.authResponse) {
+                    resolve(response.authResponse.accessToken);
+                    console.log(response.authResponse.accessToken);
+                } else if (
+                    response.status === "not_authorized" ||
+                    response.status === "unknown"
+                ) {
+                    window.FB.login(
+                        function(response) {
+                            if (response.authResponse) {
+                                resolve(response.authResponse.accessToken);
+                                console.log(response.authResponse.accessToken);
+                            } else {
+                                reject();
+                            }
+                        },
+                        { scope: "public_profile,email" }
+                    );
+                } else {
+                    reject();
+                }
+            });
         });
     },
     getLoginStatus() {
