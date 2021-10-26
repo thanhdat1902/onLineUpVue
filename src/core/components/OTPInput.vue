@@ -88,7 +88,6 @@ export default {
                 event.target.value = event.target.value.slice(0, 1);
 
             if (event.target.value.length === 1) {
-                // this.fullOtp[event.target.name.slice(-1)] = event.target.value;
                 if (event.target.name !== "digit-6") {
                     event.target.nextElementSibling.focus();
                 } else {
@@ -102,9 +101,11 @@ export default {
         },
         deleteInput(event) {
             if (event.key === "Backspace") {
-                if (event.target.name === "digit-6") event.target.value = "";
-                if (event.target.name !== "digit-1")
+                // if (event.target.name === "digit-6") event.target.value = "";
+                if (event.target.name !== "digit-1") {
                     event.target.previousElementSibling.focus();
+                    this.fullOtp[event.target.name.slice(-1) - 2] = "";
+                }
             }
             if (!(event.key >= 0 && event.key <= 9)) {
                 event.preventDefault();
@@ -139,6 +140,7 @@ export default {
     border-radius: 0.3rem;
     border: none;
     text-align: center;
+    caret-color: transparent;
 }
 .digit-group input:disabled,
 .digit-group input::placeholder {
