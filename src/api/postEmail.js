@@ -1,9 +1,6 @@
 import http from "../core/http";
 
-export default {
-    login() {
-        //  TODO
-    },
+const postEmail = {
     postEmail: async function(data) {
         try {
             const response = await http.request({
@@ -12,11 +9,10 @@ export default {
                 path: "sign-up/post-email",
             });
             console.log(response);
-            if (response.descriptionCode == "fail") return false;
-            else return true;
         } catch (err) {
             console.log(err);
-            return err.message;
         }
     },
 };
+
+export default postEmail;

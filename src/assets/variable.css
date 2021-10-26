@@ -1,0 +1,16 @@
+:root {
+    --primary_1: #6c5b7b;
+    --primary_2: #355c7d;
+    --gradient: linear-gradient(45deg, var(--primary_1), var(--primary_2));
+    --gradient_reverse: linear-gradient(
+        45deg,
+        var(--primary_2),
+        var(--primary_1)
+    );
+    --gradient_trans: linear-gradient(
+        45deg,
+        rgb(53, 92, 125, 0.9),
+        rgb(108, 91, 123, 0.9)
+    );
+    --error: #ff0000;
+}
