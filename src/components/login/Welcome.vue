@@ -154,7 +154,7 @@ export default {
         },
         signupWithFacebook: async function() {
             try {
-                const { accessToken } = await FBHelper.login();
+                const { accessToken } = await FBHelper.getToken();
                 const response = await http.request({
                     method: http.METHOD.POST,
                     data: { facebookToken: accessToken },
