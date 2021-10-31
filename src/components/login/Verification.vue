@@ -2,7 +2,7 @@
     <div id="verification">
         <div class="main">
             <div class="main__check-otp">
-                <router-link to="/register" class="main__check-otp-back-btn"
+                <router-link to="/welcome" class="main__check-otp-back-btn"
                     ><i class="fas fa-long-arrow-alt-left"> </i
                 ></router-link>
                 <div class="main__check-otp-area">
@@ -18,16 +18,41 @@
                     >
                 </div>
             </div>
+            <ErrorModal
+                class="main__check-otp-modal"
+                :error="errorMsg"
+                v-bind:show="showError"
+                @closeClicked="handleModal"
+                isVerify="true"
+            />
+            <LoadingModal
+                class="main__check-otp-modal"
+                v-bind:show="showLoading"
+                isVerify="true"
+            />
         </div>
     </div>
 </template>
 
 <script>
 import OTPInput from "../../core/components/OTPInput";
+import http from "../../core/http";
+import users from "../../api/users.js";
+import ErrorModal from "../../core/components/ErrorModal";
+import LoadingModal from "../../core/components/LoadingModal.vue";
 export default {
     name: "Verification",
+    data: function() {
+        return {
+            showError: false,
+            showLoading: false,
+            errorMsg: "",
+        };
+    },
     components: {
         OTPInput,
+        ErrorModal,
+        LoadingModal,
     },
     // data: function() {
     //     return {
@@ -48,8 +73,26 @@ export default {
     // },
     methods: {
         handleOnComplete(value) {
-            console.log("OTP completed: ", value);
+            this.showLoading = true;
             //post for verification
+            users
+                .verifyOTP({ email: http.getUserEmail(), otp: value })
+                .then((data) => {
+                    this.showLoading = false;
+                    console.log(data);
+                    if (data != true) {
+                        this.showError = true;
+                        this.errorMsg = data;
+                    } else {
+                        this.$router.push("/register");
+                    }
+                })
+                .catch((err) => {
+                    this.showLoading = false;
+                    console.log(err);
+                    this.showError = true;
+                    this.errorMsg = err;
+                });
             //if success, move to next page
             //if not, print error
         },
@@ -58,6 +101,9 @@ export default {
             //reset OTPInput
             this.$refs.resendOtp.resetOtp();
             this.timerCount = 30;
+        },
+        handleModal: function() {
+            this.showError = false;
         },
     },
 };
@@ -149,5 +195,10 @@ export default {
     border-radius: 4px;
     border: 1px solid rgba(0, 0, 0, 0.3);
     text-align: center;
+}
+
+.main__check-otp-modal {
+    height: 70vh;
+    width: 60%;
 }
 </style>

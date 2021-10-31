@@ -1,43 +1,33 @@
 <template>
     <div v-if="show" class="modal-container">
         <div class="modal hidden">
-            <button @click="handleClose" class="close-modal">&times;</button>
-            <div class="modal__error-container">
+            <div class="modal__loading-container">
                 <v-lottie-player
-                    path="https://assets9.lottiefiles.com/private_files/lf30_glnkkfua.json"
+                    path="https://assets4.lottiefiles.com/packages/lf20_e6ewcgas.json"
                     background="#FFFFFF"
                     speed="1"
-                    class="modal__error-icon"
                     loop
+                    class="modal__animation"
                     autoplay
                 ></v-lottie-player>
-                <p class="modal__error">{{ error }}</p>
+                <p class="modal__loading">Loading...</p>
             </div>
         </div>
-        <div
-            @click="handleClose"
-            class="overlay"
-            :class="{ 'overlay-verify': isVerify }"
-        ></div>
+        <div class="overlay" :class="{ 'overlay-verify': isVerify }"></div>
     </div>
 </template>
 
 <script>
 import VueLottiePlayer from "vue-lottie-player";
+
 export default {
-    name: "ErrorModal",
+    name: "LoadingModal",
     components: {
         vLottiePlayer: VueLottiePlayer,
     },
     props: {
-        error: String,
         show: Boolean,
         isVerify: Boolean,
-    },
-    methods: {
-        handleClose: function() {
-            this.$emit("closeClicked");
-        },
     },
 };
 </script>
@@ -68,47 +58,35 @@ export default {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    height: 40%;
+    height: 25%;
     width: 55%;
     z-index: 10;
     background-color: white;
-    border-radius: 5px;
     box-shadow: 0 3rem 5rem rgba(0, 0, 0, 0.3);
 
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
 }
 
-.modal .modal__error-container {
+.modal .modal__loading-container {
     display: flex;
     height: 100%;
     width: 100%;
-    align-items: center;
+    justify-content: flex-start;
 }
 
-.modal .modal__error {
-    font-size: 1rem;
+.modal .modal__loading-container .modal__animation {
+    height: 100% !important;
+    width: 50% !important;
+}
+
+.modal .modal__loading {
+    font-size: 1.5rem;
     font-weight: 500;
     text-align: center;
-    margin-right: 1rem;
-}
-
-.modal .modal__error-icon {
-    height: 90% !important;
-    width: 30% !important;
-}
-
-.close-modal {
-    font-size: 2rem;
-    color: #000;
-    cursor: pointer;
-    border: none;
-    background: none;
-    align-self: flex-end;
-    margin-bottom: -2.5rem;
-    z-index: 10;
+    margin: auto 0;
 }
 
 .overlay {

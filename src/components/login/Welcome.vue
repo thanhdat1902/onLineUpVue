@@ -54,14 +54,14 @@
                         @btnClicked="handleSignUpButton"
                         text="SIGN UP"
                         link="#"
-                        :isDisabled="signupBtnDisabled"
                     />
                 </div>
                 <ErrorModal
                     :error="errorMsg"
-                    v-bind:show="showModal"
+                    v-bind:show="showError"
                     @closeClicked="handleModal"
                 />
+                <LoadingModal v-bind:show="showLoading" />
             </div>
         </div>
     </div>
@@ -75,6 +75,7 @@ import SocialLoginButton from "../../core/components/SocialLoginBtn";
 import InputField from "../../core/components/InputField";
 import LanguageSelector from "../../core/components/LanguageSelector.vue";
 import ErrorModal from "../../core/components/ErrorModal";
+import LoadingModal from "../../core/components/LoadingModal.vue";
 
 import useVuelidate from "@vuelidate/core";
 import FBHelper from "../../helpers/FBHelper";
@@ -88,7 +89,8 @@ export default {
         return {
             email: "",
             showErrInput: false,
-            showModal: false,
+            showError: false,
+            showLoading: false,
             errorMsg: "",
             signupBtnDisabled: false,
         };
@@ -108,6 +110,7 @@ export default {
         LanguageSelector,
         Banner,
         ErrorModal,
+        LoadingModal,
     },
     methods: {
         // login: function() {
@@ -133,21 +136,33 @@ export default {
             // if (!this.validation.emailTouched) {
             //     this.invalidEmail = true;
             // }
-            {
+            if (!this.v$.$anyDirty) {
+                this.showError = true;
+                this.errorMsg =
+                    "Please fill your information before signing up ";
+            } else if (this.v$.$invalid) {
+                this.showError = true;
+                this.errorMsg =
+                    "Please correct your information before signing up";
+            } else {
+                this.showLoading = true;
                 users
                     .postEmail({ email: this.email })
                     .then((data) => {
+                        this.showLoading = false;
                         if (data != true) {
-                            this.showModal = true;
+                            this.showError = true;
                             this.errorMsg =
                                 "Failed to send OTP, please try again";
                         } else {
-                            this.$router.push("/register");
+                            http.setUserEmail(this.email);
+                            this.$router.push("/verification");
                         }
                     })
                     .catch((err) => {
+                        this.showLoading = false;
                         console.log(err);
-                        this.showModal = true;
+                        this.showError = true;
                         this.errorMsg = "Failed to send OTP, please try again";
                     });
             }
@@ -164,26 +179,26 @@ export default {
             } catch (err) {
                 console.log(err);
             }
-            // FBHelper.login().then(({ accessToken }) => {
-            //     console.log(accessToken);
-            //     http.request({
-            //         method: http.METHOD.POST,
-            //         data: { facebookToken: accessToken },
-            //         path: "sign-up/use-facebook",
-            //     })
-            //         .then((data) => {
-            //             console.log(data);
-            //         })
-            //         .catch((err) => {
-            //             console.log(err);
-            //         });
-            // });
+            FBHelper.login().then(({ accessToken }) => {
+                console.log(accessToken);
+                http.request({
+                    method: http.METHOD.POST,
+                    data: { facebookToken: accessToken },
+                    path: "sign-up/use-facebook",
+                })
+                    .then((data) => {
+                        console.log(data);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            });
         },
         logout: function() {
             FBHelper.logout();
         },
         handleModal: function() {
-            this.showModal = false;
+            this.showError = false;
         },
     },
     validations: {
