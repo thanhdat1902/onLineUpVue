@@ -2,9 +2,10 @@
     <div id="verification">
         <div class="main">
             <div class="main__check-otp">
-                <router-link to="/register" class="main__check-otp-back-btn"
-                    ><i class="fas fa-long-arrow-alt-left"> </i
-                ></router-link>
+                <BackButton
+                    branchName="Welcome"
+                    class="main__check-otp-back-btn"
+                />
                 <div class="main__check-otp-area">
                     <div class="main__check-otp-text">
                         OTP
@@ -35,10 +36,12 @@
 
 <script>
 import OTPInput from "../../core/components/OTPInput";
+import BackButton from "../../core/components/BackButton";
 export default {
     name: "Verification",
     components: {
         OTPInput,
+        BackButton,
     },
     data() {
         return {
@@ -61,7 +64,7 @@ export default {
     },
     watch: {
         timer(val) {
-            if (val === 0) console.log(val); //disable OTP
+            if (val === 0) console.log(val); //disable OTP, báo user otp invalid, mời resend, vẫn cho ng dùng nhập nhưng otp sai nên ko chấp nhận
         },
     },
     methods: {
@@ -123,7 +126,6 @@ export default {
 .main .main__check-otp-back-btn {
     width: 1rem;
     height: 1rem;
-    color: #000;
     position: absolute;
     margin: 1rem;
 }
