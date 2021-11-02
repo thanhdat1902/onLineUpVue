@@ -1,7 +1,13 @@
 <template>
-    <div id="welcome">
+    <div :class="{ 'welcome--modal': showError || showLoading }" id="welcome">
         <div class="main">
-            <Banner class="main__banner" />
+            <Banner
+                class="main__banner"
+                contentText="To keep connected with us please login with your personal info"
+                btnText="Log in"
+                bannerText="Welcome back!"
+                @btnClicked="handleLoginButton"
+            />
             <div class="main__create-acc">
                 <LanguageSelector />
                 <div class="main__create-acc-area">
@@ -150,22 +156,21 @@ export default {
                     .postEmail({ email: this.email })
                     .then((data) => {
                         this.showLoading = false;
-                        if (data != true) {
-                            this.showError = true;
-                            this.errorMsg =
-                                "Failed to send OTP, please try again";
-                        } else {
-                            http.setUserEmail(this.email);
-                            this.$router.push("/verification");
-                        }
+                        console.log(data);
+                        http.setUserEmail(this.email);
+                        this.$router.push("/verification");
                     })
                     .catch((err) => {
                         this.showLoading = false;
-                        console.log(err);
                         this.showError = true;
-                        this.errorMsg = "Failed to send OTP, please try again";
+                        this.errorMsg = err.response.data
+                            ? err.response.data.description
+                            : "Failed to send OTP, please try again";
                     });
             }
+        },
+        handleLoginButton: function() {
+            this.$router.push("/login");
         },
         signupWithFacebook: async function() {
             try {
@@ -177,7 +182,7 @@ export default {
                 });
                 console.log(response);
             } catch (err) {
-                console.log(err);
+                console.log(err.message);
             }
             FBHelper.login().then(({ accessToken }) => {
                 console.log(accessToken);
@@ -226,7 +231,7 @@ export default {
 }
 
 .error-msg {
-    min-width: 60%;
+    width: 75%;
     font-size: 0.9rem;
     color: var(--error);
 }
@@ -308,6 +313,10 @@ export default {
         border-top-right-radius: 0.5rem;
         border-bottom-right-radius: 0.5rem;
     }
+
+    .error-msg {
+        width: 60%;
+    }
 }
 
 @media (min-width: 740px) and (max-width: 1024px) {
@@ -324,6 +333,11 @@ export default {
 
     .main {
         flex-direction: column;
+    }
+
+    .welcome--modal {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+        backdrop-filter: blur(2px);
     }
 
     .main .main__create-acc {

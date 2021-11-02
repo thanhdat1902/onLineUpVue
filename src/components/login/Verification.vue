@@ -34,12 +34,12 @@
                 :error="errorMsg"
                 v-bind:show="showError"
                 @closeClicked="handleModal"
-                isVerify="true"
+                :isVerify="isVerify"
             />
             <LoadingModal
                 class="main__check-otp-modal"
                 v-bind:show="showLoading"
-                isVerify="true"
+                :isVerify="isVerify"
             />
         </div>
     </div>
@@ -58,17 +58,14 @@ export default {
             showError: false,
             showLoading: false,
             errorMsg: "",
+            timer: 30,
+            isVerify: true,
         };
     },
     components: {
         OTPInput,
         ErrorModal,
         LoadingModal,
-    },
-    data() {
-        return {
-            timer: 30,
-        };
     },
     computed: {
         timerCountdown() {
@@ -98,18 +95,15 @@ export default {
                 .then((data) => {
                     this.showLoading = false;
                     console.log(data);
-                    if (data != true) {
-                        this.showError = true;
-                        this.errorMsg = data;
-                    } else {
-                        this.$router.push("/register");
-                    }
+                    http.setAccessToken(data.data.accessToken);
+                    console.log(http.getAccessToken());
+                    this.$router.push("/register");
                 })
                 .catch((err) => {
                     this.showLoading = false;
                     console.log(err);
                     this.showError = true;
-                    this.errorMsg = err;
+                    this.errorMsg = err.message;
                 });
             //if success, move to next page
             //if not, print error
@@ -117,6 +111,22 @@ export default {
         handleResendValidation: function() {
             //resend Otp
             //reset OTPInput
+            this.showLoading = true;
+            //post for verification
+            users
+                .postEmail({ email: http.getUserEmail() })
+                .then((data) => {
+                    console.log(data);
+                    this.showLoading = false;
+                })
+                .catch((err) => {
+                    this.showLoading = false;
+                    console.log(err);
+                    this.showError = true;
+                    this.errorMsg = err.response.data
+                        ? err.response.data.description
+                        : "Cannot resend OTP. Please try again";
+                });
             this.$refs.resendOtp.resetOtp();
             this.timer = 30;
         },

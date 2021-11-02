@@ -1,7 +1,13 @@
 <template>
-    <div :class="{ 'welcome--modal': showModal }" id="welcome">
+    <div :class="{ 'welcome--modal': showError || showLoading }" id="welcome">
         <div class="main">
-            <Banner class="main__banner" />
+            <Banner
+                class="main__banner"
+                contentText="To keep connected with us please login with your personal info"
+                btnText="LOG IN"
+                bannerText="Welcome back!"
+                @btnClicked="handleLoginButton"
+            />
 
             <div class="main__create-acc">
                 <LanguageSelector />
@@ -77,9 +83,10 @@
                 </div>
                 <ErrorModal
                     :error="errorMsg"
-                    v-bind:show="showModal"
+                    v-bind:show="showError"
                     @closeClicked="handleModal"
                 />
+                <LoadingModal v-bind:show="showLoading" />
             </div>
         </div>
     </div>
@@ -89,11 +96,15 @@
 // import { AUTH_REQUEST } from "../config/constant";
 import Banner from "../../components/login/Banner.vue";
 import ErrorModal from "../../core/components/ErrorModal";
+import LoadingModal from "../../core/components/LoadingModal";
+
 import Button from "../../core/components/Button";
 import InputField from "../../core/components/InputField";
 import LanguageSelector from "../../core/components/LanguageSelector.vue";
 import useVuelidate from "@vuelidate/core";
 import { required, minLength } from "@vuelidate/validators";
+import users from "../../api/users";
+import http from "../../core/http";
 export default {
     name: "Register",
     setup: () => ({ v$: useVuelidate() }),
@@ -102,8 +113,9 @@ export default {
             username: "",
             password: "",
             confirm: "",
-            showModal: false,
+            showError: false,
             errorMsg: "",
+            showLoading: false,
         };
     },
     computed: {
@@ -129,6 +141,14 @@ export default {
                     this.v$.confirm.required.$invalid && this.v$.confirm.$dirty,
             };
         },
+        userInfo: function() {
+            return {
+                email: http.getUserEmail(),
+                fullname: this.username,
+                password: this.password,
+                confirmPassword: this.confirm,
+            };
+        },
     },
     components: {
         Button,
@@ -136,6 +156,7 @@ export default {
         LanguageSelector,
         Banner,
         ErrorModal,
+        LoadingModal,
     },
     methods: {
         // login: function() {
@@ -165,23 +186,44 @@ export default {
             this.confirm = value;
         },
         handleSignUpButton: function() {
-            console.log(this.v$);
             event.stopPropagation();
             if (!this.v$.$anyDirty) {
-                this.showModal = true;
+                this.showError = true;
                 this.errorMsg =
                     "Please fill your information before signing up ";
             } else if (this.v$.$invalid) {
-                this.showModal = true;
+                this.showError = true;
                 this.errorMsg =
                     "Please correct your information before signing up";
             } else if (this.confirm != this.password) {
-                this.showModal = true;
+                this.showError = true;
                 this.errorMsg = "Incorrect confirm password!";
+            } else {
+                this.showLoading = true;
+                console.log(this.userInfo);
+                console.log(http.getAccessToken());
+                users
+                    .createNewAccount(this.userInfo)
+                    .then((data) => {
+                        this.showLoading = false;
+                        console.log(data);
+                        this.$router.push("/login");
+                    })
+                    .catch((err) => {
+                        console.log(err.response);
+                        this.showLoading = false;
+                        this.errorMsg = err.response.data
+                            ? err.response.data.description
+                            : "Failed to register, please try again";
+                        this.showError = true;
+                    });
             }
         },
+        handleLoginButton: function() {
+            this.$router.push("/login");
+        },
         handleModal: function() {
-            this.showModal = false;
+            this.showError = false;
         },
     },
     validations: {
@@ -215,7 +257,7 @@ export default {
 }
 
 .error-msg {
-    min-width: 60%;
+    width: 75%;
     font-size: 0.9rem;
     color: var(--error);
 }
@@ -318,6 +360,10 @@ export default {
     .main .main__create-acc {
         border-top-right-radius: 0.5rem;
         border-bottom-right-radius: 0.5rem;
+    }
+
+    .error-msg {
+        width: 60%;
     }
 }
 
