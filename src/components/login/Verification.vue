@@ -6,6 +6,7 @@
                     branchName="Welcome"
                     class="main__check-otp-back-btn"
                 />
+
                 <div class="main__check-otp-area">
                     <div class="main__check-otp-text">
                         OTP
@@ -30,23 +31,45 @@
                     >
                 </div>
             </div>
+            <ErrorModal
+                class="main__check-otp-modal"
+                :error="errorMsg"
+                v-bind:show="showError"
+                @closeClicked="handleModal"
+                :isVerify="isVerify"
+            />
+            <LoadingModal
+                class="main__check-otp-modal"
+                v-bind:show="showLoading"
+                :isVerify="isVerify"
+            />
         </div>
     </div>
 </template>
 
 <script>
 import OTPInput from "../../core/components/OTPInput";
+import http from "../../core/http";
+import users from "../../api/users.js";
+import ErrorModal from "../../core/components/ErrorModal";
+import LoadingModal from "../../core/components/LoadingModal.vue";
 import BackButton from "../../core/components/BackButton";
 export default {
     name: "Verification",
+    data: function() {
+        return {
+            showError: false,
+            showLoading: false,
+            errorMsg: "",
+            timer: 30,
+            isVerify: true,
+        };
+    },
     components: {
         OTPInput,
+        ErrorModal,
+        LoadingModal,
         BackButton,
-    },
-    data() {
-        return {
-            timer: 30,
-        };
     },
     computed: {
         timerCountdown() {
@@ -69,16 +92,50 @@ export default {
     },
     methods: {
         handleOnComplete(value) {
-            console.log("OTP completed: ", value);
+            this.showLoading = true;
             //post for verification
+            users
+                .verifyOTP({ email: http.getUserEmail(), otp: value })
+                .then((data) => {
+                    this.showLoading = false;
+                    console.log(data);
+                    http.setAccessToken(data.data.accessToken);
+                    console.log(http.getAccessToken());
+                    this.$router.push("/register");
+                })
+                .catch((err) => {
+                    this.showLoading = false;
+                    console.log(err);
+                    this.showError = true;
+                    this.errorMsg = err.message;
+                });
             //if success, move to next page
             //if not, print error
         },
         handleResendValidation: function() {
             //resend Otp
             //reset OTPInput
+            this.showLoading = true;
+            //post for verification
+            users
+                .postEmail({ email: http.getUserEmail() })
+                .then((data) => {
+                    console.log(data);
+                    this.showLoading = false;
+                })
+                .catch((err) => {
+                    this.showLoading = false;
+                    console.log(err);
+                    this.showError = true;
+                    this.errorMsg = err.response.data
+                        ? err.response.data.description
+                        : "Cannot resend OTP. Please try again";
+                });
             this.$refs.resendOtp.resetOtp();
             this.timer = 30;
+        },
+        handleModal: function() {
+            this.showError = false;
         },
     },
 };
@@ -169,5 +226,10 @@ export default {
     border-radius: 4px;
     border: 1px solid rgba(0, 0, 0, 0.3);
     text-align: center;
+}
+
+.main__check-otp-modal {
+    height: 70vh;
+    width: 60%;
 }
 </style>

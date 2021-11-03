@@ -1,223 +1,297 @@
 <template>
-  <div id="welcome">
-    <div class="main">
-      <div class="main__banner">
-        <div class="main__banner-msg">Welcome back!</div>
-        <p>To keep connected with us please login with your personal info</p>
-        <Button class="signin-btn" text="LOG IN" link="#" />
-      </div>
-      <div class="main__create-acc">
-        <LanguageSelector />
-        <div class="main__create-acc-area">
-          <div class="main__create-acc-text">Create Account</div>
-          <div class="social-buttons">
-            <SocialLoginButton icon="fab fa-google" link="#" />
-            <SocialLoginButton icon="fab fa-facebook-f" link="#" />
-            <SocialLoginButton icon="fab fa-linkedin-in" link="#" />
-          </div>
-          <p>or use your email for registration:</p>
-          <InputField
-            @inputData="handleInput"
-            @blur="handleValidEmail"
-            @focus="handldeFocusInput"
-            v-model="email"
-            class="main__create-acc-input"
-            :class="{ 'input--error': invalidEmail }"
-            placeholder="Email"
-          />
-          <p
-            v-if="v$.email.required.$invalid && invalidEmail"
-            class="error-msg"
-          >
-            The email is required
-          </p>
-          <p v-if="v$.email.email.$invalid && invalidEmail" class="error-msg">
-            Invalid form of email
-          </p>
-          <Button @btnClicked="handleSignUpButton" text="SIGN UP" link="#" />
+    <div :class="{ 'welcome--modal': showError }" id="welcome">
+        <div class="main">
+            <Banner
+                class="main__banner"
+                contentText="Do not have an account yet? Create a new one"
+                btnText="SIGN UP"
+                bannerText="Welcome back!"
+                @btnClicked="handleSignUpButton"
+            />
+
+            <div class="main__create-acc">
+                <LanguageSelector />
+                <div class="main__create-acc-area">
+                    <div class="main__create-acc-text">Login</div>
+                    <InputField
+                        @inputData="handleInputEmail"
+                        v-model="email"
+                        class="input-email"
+                        placeholder="Email"
+                    />
+
+                    <InputField
+                        @inputData="handleInputPwd"
+                        v-model="password"
+                        class="input-password"
+                        input_type="password"
+                        isPwd
+                        placeholder="Password"
+                    />
+
+                    <Button
+                        class="login-btn"
+                        @btnClicked="handleLogInButton($event)"
+                        text="LOG IN"
+                        link="#"
+                    />
+                </div>
+                <ErrorModal
+                    :error="errorMsg"
+                    v-bind:show="showError"
+                    @closeClicked="handleModal"
+                />
+                <LoadingModal v-bind:show="showLoading" />
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </template>
 
 <script>
 // import { AUTH_REQUEST } from "../config/constant";
+import Banner from "./Banner.vue";
+import ErrorModal from "../../core/components/ErrorModal";
+import LoadingModal from "../../core/components/LoadingModal";
 import Button from "../../core/components/Button";
-import SocialLoginButton from "../../core/components/SocialLoginBtn";
 import InputField from "../../core/components/InputField";
 import LanguageSelector from "../../core/components/LanguageSelector.vue";
 import useVuelidate from "@vuelidate/core";
-import { required, email } from "@vuelidate/validators";
+import { required } from "@vuelidate/validators";
+import { AUTH_REQUEST } from "../../config/constant";
 export default {
-  name: "Login",
-  setup: () => ({ v$: useVuelidate() }),
-  data: function() {
-    return {
-      invalidEmail: false,
-      email: "",
-    };
-  },
-  computed: {
-    validation: function() {
-      return {
-        validEmail:
-          !this.v$.email.$touch ||
-          (!this.v$.email.email.$invalid && !this.v$.email.required.$invalid),
-        emailTouched: this.v$.email.$dirty,
-      };
+    name: "Login",
+    setup: () => ({ v$: useVuelidate() }),
+    data: function() {
+        return {
+            email: "",
+            password: "",
+            showError: false,
+            errorMsg: "",
+            showLoading: false,
+        };
     },
-  },
-  components: {
-    Button,
-    SocialLoginButton,
-    InputField,
-    LanguageSelector,
-  },
-  methods: {
-    // login: function() {
-    //   console.log(123);
-    //   const { username, password } = this;
-    //   this.$store
-    //     .dispatch("auth/" + AUTH_REQUEST, { username, password })
-    //     .then(() => {
-    //       this.$router.push("/");
-    //     });
-    // },
+    computed: {
+        errors: function() {
+            return {
+                emailRequired: this.v$.email.required.$invalid,
+                passwordRequired: this.v$.password.required.$invalid,
+            };
+        },
+        user: function() {
+            return {
+                email: this.email,
+                password: this.password,
+            };
+        },
+    },
+    components: {
+        Button,
+        InputField,
+        LanguageSelector,
+        Banner,
+        ErrorModal,
+        LoadingModal,
+    },
+    methods: {
+        // login: function() {
+        //   console.log(123);
+        //   const { email, password } = this;
+        //   this.$store
+        //     .dispatch("auth/" + AUTH_REQUEST, { email, password })
+        //     .then(() => {
+        //       this.$router.push("/");
+        //     });
+        // },
 
-    handleValidEmail: function() {
-      this.v$.email.$touch();
-      if (this.validation.validEmail) {
-        return;
-      }
-      this.invalidEmail = true;
+        handleInputEmail: function(value) {
+            this.email = value;
+        },
+        handleInputPwd: function(value) {
+            this.password = value;
+        },
+        handleInputConfirm: function(value) {
+            this.confirm = value;
+        },
+        handleLogInButton: function() {
+            console.log(this.v$);
+
+            event.stopPropagation();
+            this.showLoading = true;
+            if (this.errors.emailRequired || this.errors.passwordRequired) {
+                this.showLoading = false;
+                this.showError = true;
+                this.errorMsg =
+                    "Please fill your information before signing up ";
+            } else {
+                this.$store
+                    .dispatch("auth/" + AUTH_REQUEST, this.user)
+                    .then(() => {
+                        this.showLoading = false;
+
+                        this.$router.push("/register");
+                    })
+                    .catch((err) => {
+                        this.showLoading = false;
+                        this.showError = true;
+                        this.errorMsg = err.response.data
+                            ? err.response.data.description
+                            : "Failed to login, please try again";
+                    });
+            }
+        },
+        handleSignUpButton: function() {
+            this.$router.push("/register");
+        },
+        handleModal: function() {
+            this.showError = false;
+        },
     },
-    handleInput: function(value) {
-      this.email = value;
+    validations: {
+        email: {
+            required,
+        },
+        password: {
+            required,
+        },
     },
-    handldeFocusInput: function() {
-      this.invalidEmail = false;
-    },
-    handleSignUpButton: function() {
-      console.log(this.validation.emailTouched);
-      if (!this.validation.emailTouched) {
-        this.invalidEmail = true;
-      }
-    },
-  },
-  validations: {
-    email: {
-      required,
-      email,
-    },
-  },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 * {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-  font-size: 16px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-}
-
-.input--error {
-  border: solid 1px #ff0000 !important;
-}
-
-.error-msg {
-  min-width: 60%;
-  margin: -1.5rem 0 1.5rem 0;
-  font-size: 0.9rem;
-  color: #ff0000;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-size: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
 #welcome {
-  background-image: url("~@/assets/background_login.png");
-  background-size: cover;
-  background-position: center center;
-  min-height: 100vh;
-  position: relative;
-  display: flex;
-  flex-direction: column;
+    background-image: url("~@/assets/background_login.png");
+    background-size: cover;
+    background-position: center center;
+    min-height: 100vh;
+    position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .main {
-  height: 80vh;
-  width: 75%;
-  background-color: transparent;
-  margin: auto;
-  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
-  border-radius: 8px;
-  display: flex;
-}
+    height: 100vh;
+    width: 100%;
+    background-color: transparent;
+    margin: auto;
 
-/* Start handle banner */
-.main .main__banner {
-  max-width: 35%;
-  background: rgba(24, 66, 113, 0.9);
-  border-top-left-radius: 8px;
-  border-bottom-left-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  color: #fff;
-  align-items: center;
+    display: flex;
 }
-
-.main .main__banner .main__banner-msg,
-.main .main__create-acc .main__create-acc-text {
-  font-size: 2rem;
-  text-align: center;
-  font-weight: bold;
-}
-
-.main .main__banner p {
-  text-align: center;
-  margin: 1.5rem 0;
-}
-
-.signin-btn {
-  border: solid 1px #000;
-}
-
-/* End handle banner */
 
 /* Start handle create account part */
 .main .main__create-acc {
-  flex-grow: 4;
-  background-color: #fff;
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
-  display: flex;
-  flex-direction: column;
+    flex-grow: 4;
+    background-color: #fff;
+    position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .main__create-acc-area {
-  width: 80%;
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+    width: 80%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .main .main__create-acc .main__create-acc-text {
-  color: #184271;
+    background: var(--gradient);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2rem;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
 }
 
-.main .main__create-acc .social-buttons {
-  display: flex;
-  flex-direction: row;
-  min-width: 9rem;
-  justify-content: space-between;
+.main .main__create-acc .input-password,
+.main .main__create-acc .input-confirm {
+    margin-top: 1rem;
 }
-.main .main__create-acc .social-buttons,
-.main .main__create-acc .main__create-acc-input {
-  margin: 1.5rem 0;
+
+.login-btn {
+    margin-top: 1.5rem;
+}
+/* End handle create account part */
+
+/* Handle modal */
+.modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 50%;
+    width: 70%;
+
+    background-color: white;
+    padding: 6rem;
+    border-radius: 5px;
+    box-shadow: 0 3rem 5rem rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 5;
+    border-top-right-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+}
+
+@media (min-width: 1024px) {
+    .main {
+        height: 80vh;
+        width: 75%;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px,
+            rgba(0, 0, 0, 0.23) 0px 3px 6px;
+        border-radius: 0.5rem;
+    }
+
+    .main .main__create-acc {
+        border-top-right-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+    }
+}
+
+@media (min-width: 740px) and (max-width: 1024px) {
+    .main {
+        height: 100vh;
+        width: 100%;
+    }
+}
+
+@media (max-width: 740px) {
+    #welcome {
+        background: #fff;
+    }
+
+    .welcome--modal {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+        backdrop-filter: blur(2px);
+    }
+
+    .main {
+        flex-direction: column;
+    }
+
+    .main .main__create-acc {
+        flex-grow: 2;
+    }
 }
 </style>

@@ -1,14 +1,13 @@
 <template>
-    <div id="welcome">
+    <div :class="{ 'welcome--modal': showError || showLoading }" id="welcome">
         <div class="main">
-            <div class="main__banner">
-                <div class="main__banner-msg">Welcome back!</div>
-                <p>
-                    To keep connected with us please login with your personal
-                    info
-                </p>
-                <Button class="signin-btn" text="LOG IN" link="#" />
-            </div>
+            <Banner
+                class="main__banner"
+                contentText="To keep connected with us please login with your personal info"
+                btnText="Log in"
+                bannerText="Welcome back!"
+                @btnClicked="handleLoginButton"
+            />
             <div class="main__create-acc">
                 <LanguageSelector />
                 <div class="main__create-acc-area">
@@ -22,34 +21,53 @@
                         />
                         <SocialLoginButton icon="fab fa-linkedin-in" link="#" />
                     </div>
-                    <p>or use your email for registration:</p>
+                    <p class="main__create-acc-inst">
+                        or use your email for registration:
+                    </p>
                     <InputField
                         @inputData="handleInput"
                         @blur="handleValidEmail"
-                        @focus="handldeFocusInput"
                         v-model="email"
                         class="main__create-acc-input"
-                        :class="{ 'input--error': !validation.validEmail }"
+                        :class="{
+                            'input--error':
+                                !validation.validEmail && showErrInput,
+                        }"
                         placeholder="Email"
                     />
                     <p
-                        v-if="v$.email.required.$invalid && v$.email.$dirty"
+                        v-if="
+                            v$.email.required.$invalid &&
+                                v$.email.$dirty &&
+                                showErrInput
+                        "
                         class="error-msg"
                     >
                         The email is required
                     </p>
                     <p
-                        v-if="v$.email.email.$invalid && v$.email.$dirty"
+                        v-if="
+                            v$.email.email.$invalid &&
+                                v$.email.$dirty &&
+                                showErrInput
+                        "
                         class="error-msg"
                     >
                         Invalid form of email
                     </p>
                     <Button
+                        class="signup-btn"
                         @btnClicked="handleSignUpButton"
                         text="SIGN UP"
                         link="#"
                     />
                 </div>
+                <ErrorModal
+                    :error="errorMsg"
+                    v-bind:show="showError"
+                    @closeClicked="handleModal"
+                />
+                <LoadingModal v-bind:show="showLoading" />
             </div>
         </div>
     </div>
@@ -57,12 +75,17 @@
 
 <script>
 // import { AUTH_REQUEST } from "../config/constant";
+import Banner from "../../components/login/Banner.vue";
 import Button from "../../core/components/Button";
 import SocialLoginButton from "../../core/components/SocialLoginBtn";
 import InputField from "../../core/components/InputField";
 import LanguageSelector from "../../core/components/LanguageSelector.vue";
+import ErrorModal from "../../core/components/ErrorModal";
+import LoadingModal from "../../core/components/LoadingModal.vue";
+
 import useVuelidate from "@vuelidate/core";
 import FBHelper from "../../helpers/FBHelper";
+import users from "../../api/users.js";
 import http from "../../core/http";
 import { required, email } from "@vuelidate/validators";
 export default {
@@ -71,6 +94,11 @@ export default {
     data: function() {
         return {
             email: "",
+            showErrInput: false,
+            showError: false,
+            showLoading: false,
+            errorMsg: "",
+            signupBtnDisabled: false,
         };
     },
     computed: {
@@ -86,6 +114,9 @@ export default {
         SocialLoginButton,
         InputField,
         LanguageSelector,
+        Banner,
+        ErrorModal,
+        LoadingModal,
     },
     methods: {
         // login: function() {
@@ -100,30 +131,46 @@ export default {
 
         handleValidEmail: function() {
             this.v$.email.$touch();
+            if (!this.validation.validEmail) this.showErrInput = true;
         },
         handleInput: function(value) {
+            this.showErrInput = false;
             this.email = value;
-        },
-        handldeFocusInput: function() {
-            this.invalidEmail = false;
-            console.log(this.invalidEmail);
         },
         handleSignUpButton: function() {
             // console.log(this.validation.emailTouched);
             // if (!this.validation.emailTouched) {
-            //   this.invalidEmail = true;
+            //     this.invalidEmail = true;
             // }
-            http.request({
-                method: http.METHOD.POST,
-                data: { email: this.email },
-                path: "sign-up/post-email",
-            })
-                .then((data) => {
-                    console.log(data);
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
+            if (!this.v$.$anyDirty) {
+                this.showError = true;
+                this.errorMsg =
+                    "Please fill your information before signing up ";
+            } else if (this.v$.$invalid) {
+                this.showError = true;
+                this.errorMsg =
+                    "Please correct your information before signing up";
+            } else {
+                this.showLoading = true;
+                users
+                    .postEmail({ email: this.email })
+                    .then((data) => {
+                        this.showLoading = false;
+                        console.log(data);
+                        http.setUserEmail(this.email);
+                        this.$router.push("/verification");
+                    })
+                    .catch((err) => {
+                        this.showLoading = false;
+                        this.showError = true;
+                        this.errorMsg = err.response.data
+                            ? err.response.data.description
+                            : "Failed to send OTP, please try again";
+                    });
+            }
+        },
+        handleLoginButton: function() {
+            this.$router.push("/login");
         },
         signupWithFacebook: async function() {
             try {
@@ -135,25 +182,28 @@ export default {
                 });
                 console.log(response);
             } catch (err) {
-                console.log(err);
+                console.log(err.message);
             }
-            // FBHelper.login().then(({ accessToken }) => {
-            //     console.log(accessToken);
-            //     http.request({
-            //         method: http.METHOD.POST,
-            //         data: { facebookToken: accessToken },
-            //         path: "sign-up/use-facebook",
-            //     })
-            //         .then((data) => {
-            //             console.log(data);
-            //         })
-            //         .catch((err) => {
-            //             console.log(err);
-            //         });
-            // });
+            FBHelper.login().then(({ accessToken }) => {
+                console.log(accessToken);
+                http.request({
+                    method: http.METHOD.POST,
+                    data: { facebookToken: accessToken },
+                    path: "sign-up/use-facebook",
+                })
+                    .then((data) => {
+                        console.log(data);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            });
         },
         logout: function() {
             FBHelper.logout();
+        },
+        handleModal: function() {
+            this.showError = false;
         },
     },
     validations: {
@@ -177,14 +227,13 @@ export default {
 }
 
 .input--error {
-    border: solid 1px #ff0000 !important;
+    border: solid 1px var(--error) !important;
 }
 
 .error-msg {
-    min-width: 60%;
-    margin: -1.5rem 0 1.5rem 0;
+    width: 75%;
     font-size: 0.9rem;
-    color: #ff0000;
+    color: var(--error);
 }
 
 #welcome {
@@ -198,52 +247,19 @@ export default {
 }
 
 .main {
-    height: 80vh;
-    width: 75%;
+    height: 100vh;
+    width: 100%;
     background-color: transparent;
     margin: auto;
-    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
-    border-radius: 8px;
+
     display: flex;
 }
-
-/* Start handle banner */
-.main .main__banner {
-    max-width: 35%;
-    background: rgba(24, 66, 113, 0.9);
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    color: #fff;
-    align-items: center;
-}
-
-.main .main__banner .main__banner-msg,
-.main .main__create-acc .main__create-acc-text {
-    font-size: 2rem;
-    text-align: center;
-    font-weight: bold;
-}
-
-.main .main__banner p {
-    text-align: center;
-    margin: 1.5rem 0;
-}
-
-.signin-btn {
-    border: solid 1px #000;
-}
-
-/* End handle banner */
 
 /* Start handle create account part */
 .main .main__create-acc {
     flex-grow: 4;
     background-color: #fff;
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
+    position: relative;
     display: flex;
     flex-direction: column;
 }
@@ -258,7 +274,12 @@ export default {
 }
 
 .main .main__create-acc .main__create-acc-text {
-    color: #184271;
+    background: var(--gradient);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2rem;
+    text-align: center;
+    font-weight: bold;
 }
 
 .main .main__create-acc .social-buttons {
@@ -267,8 +288,60 @@ export default {
     min-width: 9rem;
     justify-content: space-between;
 }
-.main .main__create-acc .social-buttons,
-.main .main__create-acc .main__create-acc-input {
-    margin: 1.5rem 0;
+.main .main__create-acc .social-buttons {
+    margin: 1.5rem 0rem;
+}
+
+.main .main__create-acc .main__create-acc-inst {
+    margin-bottom: 1.5rem;
+}
+
+.signup-btn {
+    margin-top: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+    .main {
+        height: 80vh;
+        width: 75%;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px,
+            rgba(0, 0, 0, 0.23) 0px 3px 6px;
+        border-radius: 0.5rem;
+    }
+
+    .main .main__create-acc {
+        border-top-right-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+    }
+
+    .error-msg {
+        width: 60%;
+    }
+}
+
+@media (min-width: 740px) and (max-width: 1024px) {
+    .main {
+        height: 100vh;
+        width: 100%;
+    }
+}
+
+@media (max-width: 740px) {
+    #welcome {
+        background: #fff;
+    }
+
+    .main {
+        flex-direction: column;
+    }
+
+    .welcome--modal {
+        background-color: rgba(0, 0, 0, 0.5) !important;
+        backdrop-filter: blur(2px);
+    }
+
+    .main .main__create-acc {
+        flex-grow: 2;
+    }
 }
 </style>
