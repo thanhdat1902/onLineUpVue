@@ -2,9 +2,11 @@
     <div id="verification">
         <div class="main">
             <div class="main__check-otp">
-                <router-link to="/welcome" class="main__check-otp-back-btn"
-                    ><i class="fas fa-long-arrow-alt-left"> </i
-                ></router-link>
+                <BackButton
+                    branchName="Welcome"
+                    class="main__check-otp-back-btn"
+                />
+
                 <div class="main__check-otp-area">
                     <div class="main__check-otp-text">
                         OTP
@@ -51,6 +53,7 @@ import http from "../../core/http";
 import users from "../../api/users.js";
 import ErrorModal from "../../core/components/ErrorModal";
 import LoadingModal from "../../core/components/LoadingModal.vue";
+import BackButton from "../../core/components/BackButton";
 export default {
     name: "Verification",
     data: function() {
@@ -66,6 +69,7 @@ export default {
         OTPInput,
         ErrorModal,
         LoadingModal,
+        BackButton,
     },
     computed: {
         timerCountdown() {
@@ -83,7 +87,7 @@ export default {
     },
     watch: {
         timer(val) {
-            if (val === 0) console.log(val); //disable OTP
+            if (val === 0) console.log(val); //disable OTP, báo user otp invalid, mời resend, vẫn cho ng dùng nhập nhưng otp sai nên ko chấp nhận
         },
     },
     methods: {
@@ -179,7 +183,6 @@ export default {
 .main .main__check-otp-back-btn {
     width: 1rem;
     height: 1rem;
-    color: #000;
     position: absolute;
     margin: 1rem;
 }
