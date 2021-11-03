@@ -6,6 +6,8 @@ import Login from "../components/login/Login.vue";
 import Welcome from "../components/login/Welcome.vue";
 import Register from "../components/login/Register.vue";
 import Verification from "../components/login/Verification.vue";
+import ChangePwdProfile from "../components/ChangePwdProfile.vue";
+import ChangeForgotPwd from "../components/ChangeForgotPwd.vue";
 
 const ifNotAuthenticated = (to, from, next) => {
     if (!store.getters.isAuthenticated) {
@@ -68,6 +70,16 @@ export default new createRouter({
             path: "/verification",
             name: "Verification",
             component: Verification,
+        },
+        {
+            path: "/change-password",
+            name: "ChangePwdProfile",
+            component: ChangePwdProfile,
+        },
+        {
+            path: "/forgot-password",
+            name: "ChangeForgotPwd",
+            component: ChangeForgotPwd,
         },
     ],
 });
