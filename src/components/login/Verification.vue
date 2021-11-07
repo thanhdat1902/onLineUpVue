@@ -96,7 +96,6 @@ export default {
                     this.showLoading = false;
                     console.log(data);
                     http.setAccessToken(data.data.accessToken);
-                    console.log(http.getAccessToken());
                     this.$router.push("/register");
                 })
                 .catch((err) => {
