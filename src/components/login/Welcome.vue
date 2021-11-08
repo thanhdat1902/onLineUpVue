@@ -287,8 +287,6 @@ export default {
     flex-direction: row;
     min-width: 9rem;
     justify-content: space-between;
-}
-.main .main__create-acc .social-buttons {
     margin: 1.5rem 0rem;
 }
 

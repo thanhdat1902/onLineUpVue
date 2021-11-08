@@ -70,6 +70,7 @@ export default new createRouter({
             path: "/verification",
             name: "Verification",
             component: Verification,
+            props: true,
         },
         {
             path: "/change-password",

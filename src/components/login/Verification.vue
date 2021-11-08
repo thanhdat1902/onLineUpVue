@@ -65,6 +65,7 @@ export default {
             isVerify: true,
         };
     },
+    props: ["isForgotPwd"],
     components: {
         OTPInput,
         ErrorModal,
@@ -93,6 +94,7 @@ export default {
     methods: {
         handleOnComplete(value) {
             this.showLoading = true;
+            console.log(this.is);
             //post for verification
             users
                 .verifyOTP({ email: http.getUserEmail(), otp: value })
@@ -101,13 +103,16 @@ export default {
                     console.log(data);
                     http.setAccessToken(data.data.accessToken);
                     console.log(http.getAccessToken());
-                    this.$router.push("/register");
+                    this.$router.push(
+                        this.isForgotPwd ? "/forgot-password" : "/register"
+                    );
                 })
                 .catch((err) => {
                     this.showLoading = false;
-                    console.log(err);
                     this.showError = true;
-                    this.errorMsg = err.message;
+                    this.errorMsg = err.response.data
+                        ? err.response.data.description
+                        : "Cannot resend OTP. Please try again";
                 });
             //if success, move to next page
             //if not, print error

@@ -35,4 +35,11 @@ export default {
             path: "login",
         });
     },
+    confirmEmailForgotPwd(data) {
+        return http.request({
+            method: http.METHOD.POST,
+            data: data,
+            path: "user-profile/forget-password/confirm-email",
+        });
+    },
 };

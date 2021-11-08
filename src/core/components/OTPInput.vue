@@ -95,7 +95,6 @@ export default {
                     //disable making changes to input field
                     this.submitting = true;
                     //await before checking whether OTP is correct or not
-                    setTimeout(this.resetOtp, 3000);
                 }
             }
         },

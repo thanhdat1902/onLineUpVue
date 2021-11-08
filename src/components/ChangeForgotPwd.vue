@@ -3,7 +3,7 @@
         <div class="main">
             <div class="main__change-pwd">
                 <BackButton
-                    branchName="Welcome"
+                    branchName="Login"
                     class="main__change-pwd-back-btn"
                 />
                 <div class="main__change-pwd-area">
@@ -62,6 +62,18 @@
                         link="#"
                     />
                 </div>
+                <ErrorModal
+                    class="main__check-otp-modal"
+                    :error="errorMsg"
+                    v-bind:show="showError"
+                    @closeClicked="handleModal"
+                    :isVerify="isVerify"
+                />
+                <LoadingModal
+                    class="main__check-otp-modal"
+                    v-bind:show="showLoading"
+                    :isVerify="isVerify"
+                />
             </div>
         </div>
     </div>
@@ -71,6 +83,8 @@
 import BackButton from "../core/components/BackButton";
 import Button from "../core/components/Button";
 import InputField from "../core/components/InputField";
+import ErrorModal from "../core/components/ErrorModal.vue";
+import LoadingModal from "../core/components/LoadingModal.vue";
 import useVuelidate from "@vuelidate/core";
 import { required, minLength } from "@vuelidate/validators";
 export default {
@@ -82,6 +96,10 @@ export default {
             confirm: "",
             inputTouched: [false, false, false],
             anyTouched: true,
+            showError: false,
+            showLoading: false,
+            errorMsg: "",
+            isVerify: true,
         };
     },
     computed: {
@@ -108,6 +126,8 @@ export default {
         BackButton,
         Button,
         InputField,
+        ErrorModal,
+        LoadingModal,
     },
     methods: {
         handleValidInput: function(touch, checkValid) {
@@ -126,11 +146,18 @@ export default {
         handleInputConfirm: function(value) {
             this.confirm = value;
         },
+        handleModal: function() {
+            this.showError = false;
+        },
         handleConfirmButton: function() {
             if (!this.v$.$anyDirty) {
-                alert("Please fill your information before sign up");
-            } else {
-                alert("Please correct your information before sign up");
+                this.showError = true;
+                this.errorMsg =
+                    "Please fill your information before signing up ";
+            } else if (this.v$.$invalid) {
+                this.showError = true;
+                this.errorMsg =
+                    "Please correct your information before signing up";
             }
         },
     },
@@ -205,9 +232,16 @@ export default {
     color: #184271;
 }
 
+.main .main__change-pwd .main__change-pwd-inputs {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+}
+
 .main .main__change-pwd .main__change-pwd-inputs .main__change-pwd-input {
     margin-top: 1rem;
     width: 100%;
+    align-self: center;
 }
 
 .main .main__change-pwd .main__change-pwd-text {
@@ -225,8 +259,13 @@ export default {
 }
 
 .error-msg {
-    min-width: 60%;
+    width: 100%;
     font-size: 0.9rem;
     color: #ff0000;
+}
+
+.main__check-otp-modal {
+    height: 70vh;
+    width: 60%;
 }
 </style>

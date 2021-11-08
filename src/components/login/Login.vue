@@ -13,6 +13,11 @@
                 <LanguageSelector />
                 <div class="main__create-acc-area">
                     <div class="main__create-acc-text">Login</div>
+                    <div class="social-buttons">
+                        <SocialLoginButton icon="fab fa-google" link="#" />
+                        <SocialLoginButton icon="fab fa-facebook-f" link="#" />
+                        <SocialLoginButton icon="fab fa-linkedin-in" link="#" />
+                    </div>
                     <InputField
                         @inputData="handleInputEmail"
                         v-model="email"
@@ -28,6 +33,9 @@
                         isPwd
                         placeholder="Password"
                     />
+                    <p @click="handleForgetPwd" class="forget-password">
+                        Forgotten your password?
+                    </p>
 
                     <Button
                         class="login-btn"
@@ -42,6 +50,11 @@
                     @closeClicked="handleModal"
                 />
                 <LoadingModal v-bind:show="showLoading" />
+                <EmailModal
+                    v-bind:show="showEmailModal"
+                    @closeClicked="handleModal"
+                    @errorEmail="handleErrorForgotPwd"
+                />
             </div>
         </div>
     </div>
@@ -52,6 +65,10 @@
 import Banner from "./Banner.vue";
 import ErrorModal from "../../core/components/ErrorModal";
 import LoadingModal from "../../core/components/LoadingModal";
+import EmailModal from "../../core/components/EmailModal.vue";
+
+import SocialLoginButton from "../../core/components/SocialLoginBtn";
+
 import Button from "../../core/components/Button";
 import InputField from "../../core/components/InputField";
 import LanguageSelector from "../../core/components/LanguageSelector.vue";
@@ -68,6 +85,7 @@ export default {
             showError: false,
             errorMsg: "",
             showLoading: false,
+            showEmailModal: false,
         };
     },
     computed: {
@@ -91,6 +109,8 @@ export default {
         Banner,
         ErrorModal,
         LoadingModal,
+        EmailModal,
+        SocialLoginButton,
     },
     methods: {
         // login: function() {
@@ -112,9 +132,10 @@ export default {
         handleInputConfirm: function(value) {
             this.confirm = value;
         },
+        handleForgetPwd: function() {
+            this.showEmailModal = true;
+        },
         handleLogInButton: function() {
-            console.log(this.v$);
-
             event.stopPropagation();
             this.showLoading = true;
             if (this.errors.emailRequired || this.errors.passwordRequired) {
@@ -140,10 +161,16 @@ export default {
             }
         },
         handleSignUpButton: function() {
-            this.$router.push("/register");
+            this.$router.push("/welcome");
         },
         handleModal: function() {
             this.showError = false;
+            this.showEmailModal = false;
+        },
+        handleErrorForgotPwd: function(err) {
+            this.showEmailModal = false;
+            this.showError = true;
+            this.errorMsg = err;
         },
     },
     validations: {
@@ -215,9 +242,24 @@ export default {
     margin-bottom: 1.5rem;
 }
 
+.main .main__create-acc .social-buttons {
+    display: flex;
+    flex-direction: row;
+    min-width: 9rem;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
 .main .main__create-acc .input-password,
 .main .main__create-acc .input-confirm {
     margin-top: 1rem;
+}
+
+.main .main__create-acc .forget-password {
+    text-decoration: underline;
+    width: 80%;
+    margin-top: 1rem;
+    cursor: pointer;
 }
 
 .login-btn {
@@ -266,6 +308,10 @@ export default {
     .main .main__create-acc {
         border-top-right-radius: 0.5rem;
         border-bottom-right-radius: 0.5rem;
+    }
+
+    .main .main__create-acc .forget-password {
+        width: 65%;
     }
 }
 
