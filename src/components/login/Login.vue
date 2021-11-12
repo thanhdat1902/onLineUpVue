@@ -145,13 +145,18 @@ export default {
                     "Please fill your information before signing up ";
             } else {
                 this.$store
-                    .dispatch("auth/" + AUTH_REQUEST, this.user)
-                    .then(() => {
+                    .dispatch("auth/" + AUTH_REQUEST, {
+                        user: this.user,
+                        pathName: "login",
+                    })
+                    .then((res) => {
                         this.showLoading = false;
+                        console.log(res);
 
-                        this.$router.push("/register");
+                        this.$router.push("/home");
                     })
                     .catch((err) => {
+                        console.log(err.response.data.description);
                         this.showLoading = false;
                         this.showError = true;
                         this.errorMsg = err.response.data

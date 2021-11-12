@@ -17,7 +17,7 @@ const getters = {
     authStatus: (state) => state.status,
 };
 const actions = {
-    [AUTH_REQUEST]: ({ commit }, user) => {
+    [AUTH_REQUEST]: ({ commit }, { user, pathName }) => {
         return new Promise((resolve, reject) => {
             // The Promise used for router redirect in login
             console.log(process.env.VUE_APP_BASE_URL);
@@ -25,10 +25,11 @@ const actions = {
             http.request({
                 method: http.METHOD.POST,
                 data: user,
-                path: "login",
+                path: pathName,
             })
                 .then((res) => {
-                    const token = res.token;
+                    console.log(res.data.accessToken);
+                    const token = res.data.accessToken;
                     commit(AUTH_SUCCESS, token);
                     http.setAccessToken(token);
                     // you have your token, now log in your user :)
@@ -56,6 +57,7 @@ const mutations = {
         state.status = "loading";
     },
     [AUTH_SUCCESS]: (state, token) => {
+        console.log(token);
         state.status = "success";
         state.token = token;
     },

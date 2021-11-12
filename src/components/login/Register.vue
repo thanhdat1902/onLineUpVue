@@ -207,7 +207,7 @@ export default {
                     .then((data) => {
                         this.showLoading = false;
                         console.log(data);
-                        this.$router.push("/login");
+                        this.$router.push("/home");
                     })
                     .catch((err) => {
                         console.log(err.response);

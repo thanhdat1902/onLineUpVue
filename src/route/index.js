@@ -8,6 +8,7 @@ import Register from "../components/login/Register.vue";
 import Verification from "../components/login/Verification.vue";
 import ChangePwdProfile from "../components/ChangePwdProfile.vue";
 import ChangeForgotPwd from "../components/ChangeForgotPwd.vue";
+import HomeScreen from "../components/home-screen/HomeScreen.vue";
 
 const ifNotAuthenticated = (to, from, next) => {
     if (!store.getters.isAuthenticated) {
@@ -18,7 +19,9 @@ const ifNotAuthenticated = (to, from, next) => {
 };
 
 const ifAuthenticated = (to, from, next) => {
-    if (store.getters.isAuthenticated) {
+    console.log(localStorage.getItem("user-token"));
+    console.log(store.getters["auth/isAuthenticated"]);
+    if (store.getters["auth/isAuthenticated"]) {
         next();
         return;
     }
@@ -81,6 +84,12 @@ export default new createRouter({
             path: "/forgot-password",
             name: "ChangeForgotPwd",
             component: ChangeForgotPwd,
+        },
+        {
+            path: "/home",
+            name: "HomeScreen",
+            component: HomeScreen,
+            beforeEnter: ifAuthenticated,
         },
     ],
 });

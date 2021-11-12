@@ -163,7 +163,7 @@ export default {
                     .catch((err) => {
                         this.showLoading = false;
                         this.showError = true;
-                        this.errorMsg = err.response.data
+                        this.errorMsg = err.response
                             ? err.response.data.description
                             : "Failed to send OTP, please try again";
                     });
