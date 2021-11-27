@@ -1,5 +1,8 @@
 <template>
-    <div id="change-pwd">
+    <div
+        :class="{ 'welcome--modal': showError || showLoading }"
+        id="change-pwd"
+    >
         <div class="main">
             <div class="main__change-pwd">
                 <BackButton
@@ -39,15 +42,15 @@
                             @inputData="handleInputConfirm"
                             @blur="
                                 handleValidInput(
-                                    v$.confirm,
-                                    validation.validConfirm
+                                    v$.confirmNewPassword,
+                                    validation.validConfirmNewPassword
                                 )
                             "
-                            v-model="confirm"
+                            v-model="confirmNewPassword"
                             class="main__change-pwd-input input-confirm"
                             input_type="password"
                             :class="{
-                                'input--error': !validation.validConfirm,
+                                'input--error': !validation.validConfirmNewPassword,
                             }"
                             placeholder="Confirm Password"
                         />
@@ -87,13 +90,15 @@ import ErrorModal from "../core/components/ErrorModal.vue";
 import LoadingModal from "../core/components/LoadingModal.vue";
 import useVuelidate from "@vuelidate/core";
 import { required, minLength } from "@vuelidate/validators";
+import users from "../api/users.js";
+import http from "../core/http";
 export default {
     name: "ChangeForgotPwd",
     setup: () => ({ v$: useVuelidate() }),
     data: function() {
         return {
             newPassword: "",
-            confirm: "",
+            confirmNewPassword: "",
             inputTouched: [false, false, false],
             anyTouched: true,
             showError: false,
@@ -106,7 +111,7 @@ export default {
         validation: function() {
             return {
                 validNewPassword: !this.v$.newPassword.$error,
-                validConfirm: !this.v$.confirm.$error,
+                validConfirmNewPassword: !this.v$.confirmNewPassword.$error,
             };
         },
         errors: function() {
@@ -118,7 +123,8 @@ export default {
                     this.v$.newPassword.minLength.$invalid &&
                     this.v$.newPassword.$dirty,
                 confirmRequired:
-                    this.v$.confirm.required.$invalid && this.v$.confirm.$dirty,
+                    this.v$.confirmNewPassword.required.$invalid &&
+                    this.v$.confirmNewPassword.$dirty,
             };
         },
     },
@@ -139,12 +145,12 @@ export default {
 
         handleInputPwd: function(value) {
             this.newPassword = value;
-            // if (this.confirm === this.password) {
+            // if (this.confirmNewPassword === this.password) {
             //   this.invalidConfirm = false;
             // }
         },
         handleInputConfirm: function(value) {
-            this.confirm = value;
+            this.confirmNewPassword = value;
         },
         handleModal: function() {
             this.showError = false;
@@ -158,6 +164,25 @@ export default {
                 this.showError = true;
                 this.errorMsg =
                     "Please correct your information before signing up";
+            } else {
+                this.showLoading = true;
+                users
+                    .changeForgotPwd({
+                        email: http.getUserEmail(),
+                        newPass: this.newPassword,
+                        confirmNewPass: this.confirmNewPassword,
+                    })
+                    .then((data) => {
+                        console.log(data);
+                        this.$router.push("/login");
+                    })
+                    .catch((err) => {
+                        this.showLoading = false;
+                        this.showError = true;
+                        this.errorMsg = err.response.data
+                            ? err.response.data.description
+                            : "Failed to change password, please try again";
+                    });
             }
         },
     },
@@ -166,7 +191,7 @@ export default {
             required,
             minLength: minLength(6),
         },
-        confirm: {
+        confirmNewPassword: {
             required,
         },
     },
