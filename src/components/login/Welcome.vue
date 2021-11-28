@@ -163,7 +163,7 @@ export default {
                     .catch((err) => {
                         this.showLoading = false;
                         this.showError = true;
-                        this.errorMsg = err.response.data
+                        this.errorMsg = err.response
                             ? err.response.data.description
                             : "Failed to send OTP, please try again";
                     });
@@ -287,8 +287,6 @@ export default {
     flex-direction: row;
     min-width: 9rem;
     justify-content: space-between;
-}
-.main .main__create-acc .social-buttons {
     margin: 1.5rem 0rem;
 }
 

@@ -35,4 +35,21 @@ export default {
             path: "login",
         });
     },
+    confirmEmailForgotPwd(data) {
+        return http.request({
+            method: http.METHOD.POST,
+            data: data,
+            path: "user-profile/forget-password/confirm-email",
+        });
+    },
+    changeForgotPwd(data) {
+        return http.request({
+            method: http.METHOD.POST,
+            data: data,
+            path: "user-profile/forget-password/new-password",
+            headers: {
+                token_otp: http.getAccessToken(),
+            },
+        });
+    },
 };
