@@ -167,12 +167,10 @@ export default {
 }
 
 .main {
-    height: 70vh;
-    width: 60%;
+    height: 100vh;
+    width: 100%;
     background-color: transparent;
     margin: auto;
-    box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
-    border-radius: 8px;
     display: flex;
 }
 
@@ -222,19 +220,27 @@ export default {
     margin: 0.5rem 0;
 }
 
-.otp-input {
-    width: 40px;
-    height: 40px;
-    padding: 5px;
-    margin: 0 10px;
-    font-size: 20px;
-    border-radius: 4px;
-    border: 1px solid rgba(0, 0, 0, 0.3);
-    text-align: center;
-}
-
 .main__check-otp-modal {
     height: 70vh;
     width: 60%;
+}
+
+@media (min-width: 740px) {
+    .main {
+        height: 70vh;
+        width: 60%;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+        border-radius: 8px;
+    }
+}
+
+@media (max-width: 740px) {
+    .main {
+        height: 100vh;
+        width: 100%;
+    }
+    .main__check-otp-area {
+        width: 100%;
+    }
 }
 </style>
