@@ -38,8 +38,8 @@
                     <p
                         v-if="
                             v$.email.required.$invalid &&
-                                v$.email.$dirty &&
-                                showErrInput
+                            v$.email.$dirty &&
+                            showErrInput
                         "
                         class="error-msg"
                     >
@@ -48,8 +48,8 @@
                     <p
                         v-if="
                             v$.email.email.$invalid &&
-                                v$.email.$dirty &&
-                                showErrInput
+                            v$.email.$dirty &&
+                            showErrInput
                         "
                         class="error-msg"
                     >
@@ -91,7 +91,7 @@ import { required, email } from "@vuelidate/validators";
 export default {
     name: "Welcome",
     setup: () => ({ v$: useVuelidate() }),
-    data: function() {
+    data: function () {
         return {
             email: "",
             showErrInput: false,
@@ -102,12 +102,15 @@ export default {
         };
     },
     computed: {
-        validation: function() {
+        validation: function () {
             return {
                 validEmail: !this.v$.email.$dirty || !this.v$.email.$error,
                 emailTouched: this.v$.email.$dirty,
             };
         },
+    },
+    created() {
+        http.removeAccessToken();
     },
     components: {
         Button,
@@ -129,15 +132,15 @@ export default {
         //     });
         // },
 
-        handleValidEmail: function() {
+        handleValidEmail: function () {
             this.v$.email.$touch();
             if (!this.validation.validEmail) this.showErrInput = true;
         },
-        handleInput: function(value) {
+        handleInput: function (value) {
             this.showErrInput = false;
             this.email = value;
         },
-        handleSignUpButton: function() {
+        handleSignUpButton: function () {
             // console.log(this.validation.emailTouched);
             // if (!this.validation.emailTouched) {
             //     this.invalidEmail = true;
@@ -169,10 +172,10 @@ export default {
                     });
             }
         },
-        handleLoginButton: function() {
+        handleLoginButton: function () {
             this.$router.push("/login");
         },
-        signupWithFacebook: async function() {
+        signupWithFacebook: async function () {
             try {
                 const { accessToken } = await FBHelper.getToken();
                 const response = await http.request({
@@ -199,10 +202,10 @@ export default {
                     });
             });
         },
-        logout: function() {
+        logout: function () {
             FBHelper.logout();
         },
-        handleModal: function() {
+        handleModal: function () {
             this.showError = false;
         },
     },
@@ -222,8 +225,6 @@ export default {
     margin: 0;
     box-sizing: border-box;
     font-size: 16px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
 .input--error {
@@ -340,6 +341,10 @@ export default {
 
     .main .main__create-acc {
         flex-grow: 2;
+    }
+
+    .main .main__create-acc-area {
+        margin: 5rem auto;
     }
 }
 </style>

@@ -28,8 +28,10 @@ const actions = {
                 path: pathName,
             })
                 .then((res) => {
+                    console.log(res);
                     console.log(res.data.accessToken);
-                    const token = res.data.accessToken;
+                    const token = res.data.jwtResponse.accessToken;
+                    console.log(token);
                     commit(AUTH_SUCCESS, token);
                     http.setAccessToken(token);
                     // you have your token, now log in your user :)

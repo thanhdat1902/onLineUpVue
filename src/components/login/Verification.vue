@@ -8,9 +8,7 @@
                 />
 
                 <div class="main__check-otp-area">
-                    <div class="main__check-otp-text">
-                        OTP
-                    </div>
+                    <div class="main__check-otp-text">OTP</div>
                     <p>The OTP is valid for 30s</p>
                     <p
                         id="main__check-otp-timer"
@@ -56,13 +54,14 @@ import LoadingModal from "../../core/components/LoadingModal.vue";
 import BackButton from "../../core/components/BackButton";
 export default {
     name: "Verification",
-    data: function() {
+    data: function () {
         return {
             showError: false,
             showLoading: false,
             errorMsg: "",
             timer: 30,
             isVerify: true,
+            forgotPwd: Boolean,
         };
     },
     props: ["isForgotPwd"],
@@ -82,6 +81,7 @@ export default {
         },
     },
     mounted() {
+        if (!this.forgotPwd) this.forgotPwd = this.isForgotPwd;
         setInterval(() => {
             if (this.timer > 0) this.timer -= 1;
         }, 1000);
@@ -94,7 +94,6 @@ export default {
     methods: {
         handleOnComplete(value) {
             this.showLoading = true;
-            console.log(this.is);
             //post for verification
             users
                 .verifyOTP({ email: http.getUserEmail(), otp: value })
@@ -112,18 +111,22 @@ export default {
                     this.showError = true;
                     this.errorMsg = err.response.data
                         ? err.response.data.description
-                        : "Cannot resend OTP. Please try again";
+                        : "Cannot resend OT P. Please try again";
                 });
             //if success, move to next page
             //if not, print error
         },
-        handleResendValidation: function() {
+        handleResendValidation: function () {
             //resend Otp
             //reset OTPInput
             this.showLoading = true;
             //post for verification
-            users
-                .postEmail({ email: http.getUserEmail() })
+
+            const promise = this.forgotPwd
+                ? users.confirmEmailForgotPwd({ email: http.getUserEmail() })
+                : users.postEmail({ email: http.getUserEmail() });
+
+            promise
                 .then((data) => {
                     console.log(data);
                     this.showLoading = false;
@@ -136,10 +139,11 @@ export default {
                         ? err.response.data.description
                         : "Cannot resend OTP. Please try again";
                 });
+
             this.$refs.resendOtp.resetOtp();
             this.timer = 30;
         },
-        handleModal: function() {
+        handleModal: function () {
             this.showError = false;
         },
     },
@@ -152,8 +156,6 @@ export default {
     margin: 0;
     box-sizing: border-box;
     font-size: 16px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
 #verification {

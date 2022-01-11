@@ -30,7 +30,7 @@ import http from "../http/index.js";
 
 export default {
     name: "EmailModal",
-    data: function() {
+    data: function () {
         return {
             email: "",
             error: "",
@@ -43,13 +43,13 @@ export default {
         isVerify: Boolean,
     },
     methods: {
-        handleClose: function() {
+        handleClose: function () {
             this.$emit("closeClicked");
         },
-        handleInput: function(data) {
+        handleInput: function (data) {
             this.email = data;
         },
-        handleConfirmBtn: function() {
+        handleConfirmBtn: function () {
             console.log(this.email);
             users
                 .confirmEmailForgotPwd({ email: this.email })
@@ -63,7 +63,7 @@ export default {
                 })
                 .catch((err) => {
                     console.log(err.response);
-                    this.error = err.response.data
+                    this.error = err.response
                         ? err.response.data.description
                         : "Failed to send OTP, please try again";
                     this.$emit("errorEmail", this.error);

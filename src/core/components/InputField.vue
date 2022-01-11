@@ -3,8 +3,8 @@
     <div class="input-field">
         <input
             ref="input"
-            class="input-field__tyepin"
             :type="type_input"
+            class="input-field__tyepin"
             :placeholder="placeholder"
             @blur="$emit('blur')"
             @input="updateValue"
@@ -28,7 +28,7 @@ export default {
         input_type: String,
         isPwd: Boolean,
     },
-    data: function() {
+    data: function () {
         return {
             show: true,
             showText: true,
@@ -36,11 +36,14 @@ export default {
             pwd: String,
         };
     },
+    mounted() {
+        console.log(this.type_input);
+    },
     methods: {
         updateValue(event) {
             this.$emit("inputData", event.target.value);
         },
-        showPwd: function() {
+        showPwd: function () {
             this.show = !this.show;
             this.showText = !this.showText;
             this.type_input =

@@ -8,8 +8,8 @@ import { AUTH_LOGOUT } from "./config/constant";
 export default {
     name: "App",
     components: {},
-    created: function() {
-        axios.interceptors.response.use(undefined, function(err) {
+    created: function () {
+        axios.interceptors.response.use(undefined, function (err) {
             return new Promise((resolve, reject) => {
                 if (
                     err.status === 401 &&
@@ -30,8 +30,15 @@ export default {
 </script>
 
 <style scoped>
+* {
+    font-family: "Encode Sans", sans-serif;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
 #app {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;

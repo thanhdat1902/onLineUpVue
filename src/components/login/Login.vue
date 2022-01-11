@@ -1,5 +1,5 @@
 <template>
-    <div :class="{ 'welcome--modal': showError }" id="welcome">
+    <div :class="{ 'welcome--modal': showError }" id="login">
         <div class="main">
             <Banner
                 class="main__banner"
@@ -78,7 +78,7 @@ import { AUTH_REQUEST } from "../../config/constant";
 export default {
     name: "Login",
     setup: () => ({ v$: useVuelidate() }),
-    data: function() {
+    data: function () {
         return {
             email: "",
             password: "",
@@ -89,13 +89,13 @@ export default {
         };
     },
     computed: {
-        errors: function() {
+        errors: function () {
             return {
                 emailRequired: this.v$.email.required.$invalid,
                 passwordRequired: this.v$.password.required.$invalid,
             };
         },
-        user: function() {
+        user: function () {
             return {
                 email: this.email,
                 password: this.password,
@@ -123,19 +123,19 @@ export default {
         //     });
         // },
 
-        handleInputEmail: function(value) {
+        handleInputEmail: function (value) {
             this.email = value;
         },
-        handleInputPwd: function(value) {
+        handleInputPwd: function (value) {
             this.password = value;
         },
-        handleInputConfirm: function(value) {
+        handleInputConfirm: function (value) {
             this.confirm = value;
         },
-        handleForgetPwd: function() {
+        handleForgetPwd: function () {
             this.showEmailModal = true;
         },
-        handleLogInButton: function() {
+        handleLogInButton: function () {
             event.stopPropagation();
             this.showLoading = true;
             if (this.errors.emailRequired || this.errors.passwordRequired) {
@@ -156,23 +156,22 @@ export default {
                         this.$router.push("/home");
                     })
                     .catch((err) => {
-                        console.log(err.response.data.description);
                         this.showLoading = false;
                         this.showError = true;
-                        this.errorMsg = err.response.data
+                        this.errorMsg = err.response
                             ? err.response.data.description
                             : "Failed to login, please try again";
                     });
             }
         },
-        handleSignUpButton: function() {
+        handleSignUpButton: function () {
             this.$router.push("/welcome");
         },
-        handleModal: function() {
+        handleModal: function () {
             this.showError = false;
             this.showEmailModal = false;
         },
-        handleErrorForgotPwd: function(err) {
+        handleErrorForgotPwd: function (err) {
             this.showEmailModal = false;
             this.showError = true;
             this.errorMsg = err;
@@ -196,11 +195,9 @@ export default {
     margin: 0;
     box-sizing: border-box;
     font-size: 16px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
-#welcome {
+#login {
     background-image: url("~@/assets/background_login.png");
     background-size: cover;
     background-position: center center;

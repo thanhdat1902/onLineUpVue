@@ -1,14 +1,15 @@
 import store from "../store"; // your vuex store
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "../components/Home.vue";
 import Account from "../components/Account.vue";
 import Login from "../components/login/Login.vue";
 import Welcome from "../components/login/Welcome.vue";
 import Register from "../components/login/Register.vue";
 import Verification from "../components/login/Verification.vue";
 import ChangePwdProfile from "../components/ChangePwdProfile.vue";
-import ChangeForgotPwd from "../components/ChangeForgotPwd.vue";
+import ChangeForgotPwd from "../components/login/ChangeForgotPwd.vue";
 import HomeScreen from "../components/home-screen/HomeScreen.vue";
+import CreateRoomForm from "../components/room/create-form/CreateRoomForm.vue";
+import JoinRoomScreen from "../components/room/room-detail/JoinRoomScreen.vue";
 
 const ifNotAuthenticated = (to, from, next) => {
     if (!store.getters.isAuthenticated) {
@@ -33,13 +34,7 @@ export default new createRouter({
     routes: [
         {
             path: "/",
-            name: "Home",
-            component: Home,
-        },
-        {
-            path: "/welcome",
-            name: "Welcome",
-            component: Welcome,
+            redirect: "/welcome",
         },
         {
             path: "/welcome",
@@ -89,7 +84,17 @@ export default new createRouter({
             path: "/home",
             name: "HomeScreen",
             component: HomeScreen,
-            beforeEnter: ifAuthenticated,
+            // beforeEnter: ifAuthenticated,
+        },
+        {
+            path: "/form",
+            name: "CreateRoomForm",
+            component: CreateRoomForm,
+        },
+        {
+            path: "/join-room",
+            name: "JoinRoomScreen",
+            component: JoinRoomScreen,
         },
     ],
 });
