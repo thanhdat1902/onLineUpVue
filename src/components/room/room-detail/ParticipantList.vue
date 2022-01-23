@@ -9,7 +9,7 @@
                         class="fas fa-user-circle"
                     ></i>
                     <p>
-                        Name
+                        {{ adminName }}
                         <br />
                         <span style="font-size=0.5rem">Room Host</span>
                     </p>
@@ -23,7 +23,7 @@
             <li v-for="n in 5" :key="n">
                 <div class="user-name">
                     <i class="fas fa-user-circle"></i>
-                    <p>Name</p>
+                    <p>Queuer</p>
                 </div>
 
                 <div>
@@ -39,7 +39,9 @@
 export default {
     name: "ParticipantList",
     components: {},
-    props: {},
+    props: {
+        adminName: String,
+    },
 };
 </script>
 
@@ -94,6 +96,7 @@ export default {
 
 .participants__list li i {
     padding: 0 0.2rem;
+    cursor: pointer;
 }
 
 .participants__list li span {

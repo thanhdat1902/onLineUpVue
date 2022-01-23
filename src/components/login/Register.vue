@@ -108,7 +108,7 @@ import http from "../../core/http";
 export default {
     name: "Register",
     setup: () => ({ v$: useVuelidate() }),
-    data: function() {
+    data: function () {
         return {
             username: "",
             password: "",
@@ -119,14 +119,14 @@ export default {
         };
     },
     computed: {
-        validation: function() {
+        validation: function () {
             return {
                 validUsername: !this.v$.username.$error,
                 validPassword: !this.v$.password.$error,
                 validConfirm: !this.v$.confirm.$error,
             };
         },
-        errors: function() {
+        errors: function () {
             return {
                 usernameRequired:
                     this.v$.username.required.$invalid &&
@@ -141,7 +141,7 @@ export default {
                     this.v$.confirm.required.$invalid && this.v$.confirm.$dirty,
             };
         },
-        userInfo: function() {
+        userInfo: function () {
             return {
                 email: http.getUserEmail(),
                 fullname: this.username,
@@ -169,23 +169,23 @@ export default {
         //     });
         // },
 
-        handleValidInput: function(touch) {
+        handleValidInput: function (touch) {
             touch.$touch();
         },
 
-        handleInputUsername: function(value) {
+        handleInputUsername: function (value) {
             this.username = value;
         },
-        handleInputPwd: function(value) {
+        handleInputPwd: function (value) {
             this.password = value;
             // if (this.confirm === this.password) {
             //   this.invalidConfirm = false;
             // }
         },
-        handleInputConfirm: function(value) {
+        handleInputConfirm: function (value) {
             this.confirm = value;
         },
-        handleSignUpButton: function() {
+        handleSignUpButton: function () {
             event.stopPropagation();
             if (!this.v$.$anyDirty) {
                 this.showError = true;
@@ -207,6 +207,7 @@ export default {
                     .then((data) => {
                         this.showLoading = false;
                         console.log(data);
+                        http.setUserId(data.data.userInfo.id);
                         this.$router.push("/home");
                     })
                     .catch((err) => {
@@ -219,10 +220,10 @@ export default {
                     });
             }
         },
-        handleLoginButton: function() {
+        handleLoginButton: function () {
             this.$router.push("/login");
         },
-        handleModal: function() {
+        handleModal: function () {
             this.showError = false;
         },
     },

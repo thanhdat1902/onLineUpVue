@@ -25,4 +25,28 @@ export default {
             headers: { Authorization: `Bearer ${http.getAccessToken()}` },
         });
     },
+    getRoomDetail: async function (data) {
+        return http.request({
+            method: http.METHOD.POST,
+            data: data,
+            path: "room/detail",
+            headers: { Authorization: `Bearer ${http.getAccessToken()}` },
+        });
+    },
+    searchRoom: async function (data) {
+        return http.request({
+            method: http.METHOD.POST,
+            data: data,
+            path: "room/search-room",
+            headers: { Authorization: `Bearer ${http.getAccessToken()}` },
+        });
+    },
+    addQueuer: async function (data) {
+        return http.request({
+            method: http.METHOD.POST,
+            data: data,
+            path: "room/join-room",
+            headers: { Authorization: `Bearer ${http.getAccessToken()}` },
+        });
+    },
 };

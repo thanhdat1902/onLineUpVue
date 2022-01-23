@@ -1,6 +1,6 @@
 <template>
     <div id="header">
-        <div class="header__logo">
+        <div @click="handleLogoClicked" class="header__logo">
             <i class="far fa-clock header__clock-icon"></i>
             <p>onLineUp</p>
         </div>
@@ -21,7 +21,11 @@ export default {
     name: "Header",
     components: {},
     props: {},
-    methods: {},
+    methods: {
+        handleLogoClicked: function () {
+            this.$router.push("/home");
+        },
+    },
 };
 </script>
 
@@ -46,6 +50,7 @@ export default {
 .header__logo {
     display: flex;
     align-items: center;
+    cursor: pointer;
 }
 
 .header__logo > p {

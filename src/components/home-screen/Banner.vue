@@ -9,11 +9,13 @@
             <button class="banner__create-room-btn">Create a room</button>
             <div class="banner__search-bar">
                 <input
+                    v-model="keyword"
+                    @keyup.enter="handleSearch"
                     class="banner__search-input"
                     type="text"
                     placeholder="Search"
                 />
-                <button class="banner__search-icon">
+                <button @click="handleSearch" class="banner__search-icon">
                     <i class="social-button__icon fas fa-search fa-lg"></i>
                 </button>
             </div>
@@ -22,11 +24,23 @@
 </template>
 
 <script>
+import http from "../../core/http";
 export default {
     name: "Banner",
     components: {},
     props: {},
-    methods: {},
+    data: function () {
+        return {
+            keyword: "",
+        };
+    },
+    methods: {
+        handleSearch: function () {
+            http.setSearchKey(this.keyword);
+            this.$emit("searchClicked");
+            this.$router.push("/search-room");
+        },
+    },
 };
 </script>
 

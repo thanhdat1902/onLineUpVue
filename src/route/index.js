@@ -10,6 +10,7 @@ import ChangeForgotPwd from "../components/login/ChangeForgotPwd.vue";
 import HomeScreen from "../components/home-screen/HomeScreen.vue";
 import CreateRoomForm from "../components/room/create-form/CreateRoomForm.vue";
 import JoinRoomScreen from "../components/room/room-detail/JoinRoomScreen.vue";
+import SearchRoom from "../components/home-screen/SearchRoom.vue";
 
 const ifNotAuthenticated = (to, from, next) => {
     if (!store.getters.isAuthenticated) {
@@ -87,14 +88,22 @@ export default new createRouter({
             // beforeEnter: ifAuthenticated,
         },
         {
+            path: "/search-room",
+            // redirect: "/search-room",
+            name: "SearchRoom",
+            component: SearchRoom,
+            // beforeEnter: ifAuthenticated,
+        },
+        {
             path: "/form",
             name: "CreateRoomForm",
             component: CreateRoomForm,
         },
         {
-            path: "/join-room",
+            path: "/join-rooms/:roomId",
             name: "JoinRoomScreen",
             component: JoinRoomScreen,
+            props: true,
         },
     ],
 });

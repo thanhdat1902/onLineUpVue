@@ -1,13 +1,19 @@
 <template>
     <div id="list-room">
         <p>{{ listName }}</p>
-        <!-- <div class="list-room__empty">You have not joined any room yet</div> -->
+        <div v-if="!this.listRoom.length && isJoined" class="list-room__empty">
+            You have not joined any room yet
+        </div>
+        <div v-if="!this.listRoom.length && !isJoined" class="list-room__empty">
+            You have not owned any room yet
+        </div>
 
         <div
             v-bind:class="{ 'list-room__room-container--border': isJoined }"
             class="list-room__room-container"
         >
             <RoomTag
+                @click="handleClickRoom(room)"
                 class="list-room__room"
                 v-for="room in listRoom"
                 :key="room"
@@ -23,6 +29,7 @@
 
 <script>
 import RoomTag from "../home-screen/RoomTag.vue";
+import http from "../../core/http/index";
 export default {
     name: "ListRoom",
     components: {
@@ -32,6 +39,16 @@ export default {
         listRoom: Array,
         listName: String,
         isJoined: Boolean,
+    },
+    methods: {
+        handleClickRoom: function (room) {
+            console.log(room);
+            http.setCurrentRoom(room.id);
+            this.$router.push({
+                name: "JoinRoomScreen",
+                params: { roomId: room.id },
+            });
+        },
     },
 };
 </script>

@@ -34,7 +34,6 @@ export default {
             .getListJoinedRoom()
             .then((res) => {
                 this.listRoom = res.data;
-                console.log(res);
                 this.modifyListRoom(this.listRoom);
             })
             .catch((err) => console.log(err));
@@ -44,7 +43,6 @@ export default {
             .getListOwnerRoom()
             .then((res) => {
                 this.listOwnerRoom = res.data;
-                console.log(res);
                 this.modifyListRoom(this.listOwnerRoom);
             })
             .catch((err) => console.log(err));
@@ -72,8 +70,6 @@ export default {
                     navigator.language,
                     option
                 ).format(end);
-                console.log(room.startDate);
-                console.log(room.endDate);
             });
         },
     },

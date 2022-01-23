@@ -75,6 +75,7 @@ import LanguageSelector from "../../core/components/LanguageSelector.vue";
 import useVuelidate from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import { AUTH_REQUEST } from "../../config/constant";
+import http from "../../core/http";
 export default {
     name: "Login",
     setup: () => ({ v$: useVuelidate() }),
@@ -151,7 +152,8 @@ export default {
                     })
                     .then((res) => {
                         this.showLoading = false;
-                        console.log(res);
+                        console.log(res.data.userInfo.id);
+                        http.setUserId(res.data.userInfo.id);
 
                         this.$router.push("/home");
                     })

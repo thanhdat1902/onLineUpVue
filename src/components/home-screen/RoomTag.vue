@@ -37,9 +37,6 @@ export default {
         start: String,
         end: String,
     },
-    mounted() {
-        console.log(this.roomName);
-    },
     methods: {},
 };
 </script>

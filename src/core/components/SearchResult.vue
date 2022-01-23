@@ -1,25 +1,29 @@
 <template>
     <div class="result-card">
         <span class="result-tag"></span>
-        <img class="result-img" src="~@/assets/ong_nam.jpg" alt="Host's image">
+        <img
+            class="result-img"
+            src="~@/assets/ong_nam.jpg"
+            alt="Host's image"
+        />
         <span class="result-info-list">
-            <p class="result-name">{{roomName}}</p>
+            <p class="result-name">{{ roomName }}</p>
             <span class="result-info">
                 <i class="info-icon far fa-user"></i>
-                <p class="info-content">{{hostName}}</p>
+                <p class="info-content">{{ hostName }}</p>
             </span>
             <span class="info-divider"></span>
             <span class="result-info">
                 <i class="info-icon far fa-compass"></i>
-                <p class="info-content">{{location}}</p>
+                <p class="info-content">{{ location }}</p>
             </span>
             <span class="result-info">
                 <i class="info-icon far fa-calendar"></i>
-                <p class="info-content">{{startDate}}</p>
+                <p class="info-content">{{ startDate }}</p>
             </span>
             <span class="result-info">
                 <i class="info-icon far fa-calendar"></i>
-                <p class="info-content">{{endDate}}</p>
+                <p class="info-content">{{ endDate }}</p>
             </span>
         </span>
     </div>
@@ -28,7 +32,7 @@
 <script>
 export default {
     name: "SearchResult",
-    props:{
+    props: {
         roomName: {
             type: String,
             default: "Room Name",
@@ -49,7 +53,7 @@ export default {
             type: String,
             default: "Start date & time",
         },
-    }
+    },
 };
 </script>
 
@@ -67,13 +71,14 @@ export default {
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin: 1rem auto;
+    margin: 1.5rem auto;
     position: relative;
+    cursor: pointer;
 }
 
 .result-tag {
     position: absolute;
-    background: #5590BA;
+    background: #5590ba;
     border-radius: 5px;
     width: 120px;
     height: 7px;
@@ -84,7 +89,7 @@ export default {
 .result-img {
     width: 15rem;
     height: 13rem;
-    padding: 0 3rem 0; 
+    padding: 0 3rem 0;
 }
 
 .result-info-list {

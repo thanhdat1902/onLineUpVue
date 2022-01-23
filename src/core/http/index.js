@@ -33,6 +33,36 @@ export default {
     getUserEmail() {
         return localStorage.getItem("user-email");
     },
+    setUserId(id) {
+        localStorage.setItem("user-id", id);
+    },
+
+    removeUserId() {
+        localStorage.removeItem("user-id");
+    },
+    getUserId() {
+        return localStorage.getItem("user-id");
+    },
+    setCurrentRoom(ID) {
+        localStorage.setItem("current-room", ID);
+    },
+
+    removeCurrentRoom() {
+        localStorage.removeItem("current-room");
+    },
+    getCurrentRoom() {
+        return localStorage.getItem("current-room");
+    },
+    setSearchKey(key) {
+        localStorage.setItem("search-key", key);
+    },
+
+    removeSearchKey() {
+        localStorage.removeItem("search-key");
+    },
+    getSearchKey() {
+        return localStorage.getItem("search-key");
+    },
 
     _getHeader(headers) {
         headers = headers
@@ -88,9 +118,7 @@ export default {
                     .catch(reject);
             };
 
-            axios(options)
-                .then(_successHandler)
-                .catch(_failHandler);
+            axios(options).then(_successHandler).catch(_failHandler);
 
             //   if (__D   EV__) {
             //     console.log(

@@ -10,7 +10,7 @@ export default {
         link: String,
     },
     methods: {
-        handleClicked: function() {
+        handleClicked: function () {
             this.$emit("btnClicked", event.target.value);
         },
     },
